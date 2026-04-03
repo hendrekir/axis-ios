@@ -17,8 +17,8 @@ struct SignInView: View {
                     .font(.system(size: 72))
                     .foregroundStyle(Color.accentColor)
 
-                Text("Axis")
-                    .font(.system(size: 44, weight: .bold, design: .rounded))
+                Text("AXIS")
+                    .font(.system(size: 44, weight: .heavy))
 
                 Text("Be phone lazy.\nBe world productive.")
                     .font(.title3)
@@ -74,6 +74,7 @@ struct SignInView: View {
                 .padding(.horizontal, 48)
                 .padding(.bottom, 24)
         }
+        .background(Color("AxisBackground"))
     }
 
     private func signInWithClerk() {

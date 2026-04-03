@@ -50,7 +50,7 @@ struct ThreadView: View {
                     .textFieldStyle(.plain)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 10)
-                    .background(.fill.tertiary, in: Capsule())
+                    .background(Color("AxisCard"), in: Capsule())
 
                 if inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                     Button {
@@ -77,6 +77,7 @@ struct ThreadView: View {
         }
         .navigationTitle("Axis")
         .navigationBarTitleDisplayMode(.inline)
+        .background(Color("AxisBackground"))
         .task { await loadMessages() }
         .refreshable { await loadMessages() }
     }

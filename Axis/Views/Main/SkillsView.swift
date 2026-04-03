@@ -81,7 +81,7 @@ private struct SkillCard: View {
         }
         .padding(16)
         .frame(maxWidth: .infinity)
-        .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 16))
+        .background(Color("AxisCard"), in: RoundedRectangle(cornerRadius: 16))
     }
 }
 

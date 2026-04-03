@@ -59,6 +59,8 @@ struct BriefView: View {
         }
         .navigationTitle("Brief")
         .navigationBarTitleDisplayMode(.inline)
+        .scrollContentBackground(.hidden)
+        .background(Color("AxisBackground"))
         .task { await loadBrief() }
         .refreshable { await loadBrief() }
     }
@@ -91,7 +93,7 @@ private struct BriefCard: View {
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 16))
+        .background(Color("AxisCard"), in: RoundedRectangle(cornerRadius: 16))
         .padding(.horizontal)
     }
 }

@@ -74,7 +74,7 @@ private struct InsightCard: View {
                 .foregroundStyle(.secondary)
         }
         .padding(16)
-        .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 16))
+        .background(Color("AxisCard"), in: RoundedRectangle(cornerRadius: 16))
         .padding(.horizontal)
     }
 }

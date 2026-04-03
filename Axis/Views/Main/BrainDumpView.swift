@@ -27,7 +27,7 @@ struct BrainDumpView: View {
                         .frame(minHeight: 200)
                         .scrollContentBackground(.hidden)
                         .padding(16)
-                        .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 16))
+                        .background(Color("AxisCard"), in: RoundedRectangle(cornerRadius: 16))
                         .padding(.horizontal)
                         .overlay(alignment: .topLeading) {
                             if text.isEmpty {
@@ -77,8 +77,9 @@ struct BrainDumpView: View {
                 .background(.bar)
             }
         }
-        .navigationTitle("Brain Dump")
+        .navigationTitle("Mind")
         .navigationBarTitleDisplayMode(.inline)
+        .background(Color("AxisBackground"))
         .sheet(isPresented: $showResult) {
             if let result {
                 BrainDumpResultSheet(result: result)

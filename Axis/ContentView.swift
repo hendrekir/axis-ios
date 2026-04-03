@@ -62,24 +62,24 @@ struct MainTabView: View {
     var body: some View {
         TabView {
             NavigationStack {
-                ThreadView()
-            }
-            .tabItem {
-                Label("Thread", systemImage: "bubble.left.fill")
-            }
-
-            NavigationStack {
                 SignalView()
             }
             .tabItem {
-                Label("Signal", systemImage: "bolt.fill")
+                Label("Situation", systemImage: "circle.hexagongrid.fill")
+            }
+
+            NavigationStack {
+                ThreadView()
+            }
+            .tabItem {
+                Label("Axis", systemImage: "bubble.left.fill")
             }
 
             NavigationStack {
                 BrainDumpView()
             }
             .tabItem {
-                Label("Dump", systemImage: "brain.head.profile")
+                Label("Mind", systemImage: "brain.head.profile")
             }
 
             NavigationStack {
@@ -88,14 +88,8 @@ struct MainTabView: View {
             .tabItem {
                 Label("Brief", systemImage: "sunrise.fill")
             }
-
-            NavigationStack {
-                SettingsView(onSignedOut: onSignedOut)
-            }
-            .tabItem {
-                Label("Settings", systemImage: "gearshape.fill")
-            }
         }
+        .tint(Color("AccentColor"))
     }
 }
 
