@@ -36,7 +36,7 @@ struct ApprenticeView: View {
         .navigationTitle("Apprentice")
         .navigationBarTitleDisplayMode(.inline)
         .scrollContentBackground(.hidden)
-        .background(Color("AxisBackground"))
+        .background(Color.axisBackground)
         .task { await loadInsights() }
         .refreshable { await loadInsights() }
     }
@@ -76,7 +76,7 @@ private struct InsightCard: View {
                 .foregroundStyle(.secondary)
         }
         .padding(16)
-        .background(Color("AxisCard"), in: RoundedRectangle(cornerRadius: 16))
+        .background(Color.axisSurface1, in: RoundedRectangle(cornerRadius: 16))
         .padding(.horizontal)
     }
 }

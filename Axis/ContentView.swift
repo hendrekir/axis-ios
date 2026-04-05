@@ -4,23 +4,32 @@ import ClerkKit
 struct ContentView: View {
     var body: some View {
         #if targetEnvironment(simulator)
-        // Simulator: skip auth, go straight to app with dev token
-        MainTabView(onSignedOut: {
-            KeychainService.shared.delete(.clerkJWT)
-        })
-        .onAppear {
-            if KeychainService.shared.get(.clerkJWT) == nil {
-                KeychainService.shared.set(.clerkJWT, value: "dev-simulator-token")
-            }
-        }
+        SimulatorGate()
         #else
-        // Device: use real Clerk auth
         AuthGate()
         #endif
     }
 }
 
-// MARK: - Auth Gate (device only)
+// MARK: - Simulator Gate (bypass Clerk, Sign in with Apple not supported)
+
+struct SimulatorGate: View {
+    @State private var isSignedIn = false
+
+    var body: some View {
+        if isSignedIn {
+            MainTabView(onSignedOut: {
+                isSignedIn = false
+            })
+        } else {
+            SignInView(onSimulatorSignIn: {
+                isSignedIn = true
+            })
+        }
+    }
+}
+
+// MARK: - Auth Gate (device only — real Clerk auth)
 
 struct AuthGate: View {
     @State private var isLoaded = false
@@ -33,11 +42,13 @@ struct AuthGate: View {
         Group {
             if !isLoaded {
                 ProgressView("Loading...")
+                    .tint(Color.accentColor)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color.axisBackground)
             } else if isSignedIn {
                 MainTabView(onSignedOut: {
                     Task {
                         try? await Clerk.shared.session?.revoke()
-                        KeychainService.shared.delete(.clerkJWT)
                     }
                 })
             } else {
@@ -45,51 +56,11 @@ struct AuthGate: View {
             }
         }
         .task {
-            // Wait for Clerk to load its environment
             while !Clerk.shared.isLoaded {
                 try? await Task.sleep(for: .milliseconds(100))
             }
             isLoaded = true
         }
-    }
-}
-
-// MARK: - Main Tab View
-
-struct MainTabView: View {
-    var onSignedOut: () -> Void
-
-    var body: some View {
-        TabView {
-            NavigationStack {
-                SignalView()
-            }
-            .tabItem {
-                Label("Situation", systemImage: "circle.hexagongrid.fill")
-            }
-
-            NavigationStack {
-                ThreadView()
-            }
-            .tabItem {
-                Label("Axis", systemImage: "bubble.left.fill")
-            }
-
-            NavigationStack {
-                BrainDumpView()
-            }
-            .tabItem {
-                Label("Mind", systemImage: "brain.head.profile")
-            }
-
-            NavigationStack {
-                BriefView()
-            }
-            .tabItem {
-                Label("Brief", systemImage: "sunrise.fill")
-            }
-        }
-        .tint(Color("AccentColor"))
     }
 }
 

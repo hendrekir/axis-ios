@@ -84,7 +84,7 @@ struct BriefView: View {
         .navigationTitle("Brief")
         .navigationBarTitleDisplayMode(.inline)
         .scrollContentBackground(.hidden)
-        .background(Color("AxisBackground"))
+        .background(Color.axisBackground)
         .task { await loadBrief() }
         .refreshable { await loadBrief() }
     }
@@ -118,7 +118,7 @@ private struct BriefCard: View {
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color("AxisCard"), in: RoundedRectangle(cornerRadius: 16))
+        .background(Color.axisSurface1, in: RoundedRectangle(cornerRadius: 16))
         .padding(.horizontal)
     }
 }
@@ -189,7 +189,7 @@ private struct GmailStatusRow: View {
             }
         }
         .padding(12)
-        .background(Color("AxisCard"), in: RoundedRectangle(cornerRadius: 12))
+        .background(Color.axisSurface1, in: RoundedRectangle(cornerRadius: 12))
     }
 }
 

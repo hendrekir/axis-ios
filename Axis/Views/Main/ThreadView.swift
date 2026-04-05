@@ -2,85 +2,35 @@ import SwiftUI
 
 struct ThreadView: View {
     @State private var messages: [ThreadMessage] = []
-    @State private var inputText = ""
     @State private var isLoading = true
-    @State private var isSending = false
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Messages
-            ScrollViewReader { proxy in
-                ScrollView {
-                    LazyVStack(spacing: 12) {
-                        ForEach(messages) { message in
-                            MessageBubble(message: message)
-                                .id(message.id)
-                        }
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
-                }
-                .onChange(of: messages.count) {
-                    if let last = messages.last {
-                        withAnimation(.easeOut(duration: 0.2)) {
-                            proxy.scrollTo(last.id, anchor: .bottom)
-                        }
-                    }
-                }
-            }
-            .onTapGesture { hideKeyboard() }
-            .overlay {
-                if isLoading {
-                    ProgressView()
-                }
-                if !isLoading && messages.isEmpty {
-                    ContentUnavailableView(
-                        "No messages yet",
-                        systemImage: "bubble.left.and.bubble.right",
-                        description: Text("Axis will message you here when something needs your attention.")
-                    )
-                }
-            }
-
-            Divider()
-
-            // Input bar
-            HStack(spacing: 12) {
-                TextField("Message Axis...", text: $inputText, axis: .vertical)
-                    .lineLimit(1...5)
-                    .textFieldStyle(.plain)
-                    .foregroundStyle(.primary)
-                    .tint(Color.accentColor)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 10)
-                    .background(Color("AxisCard"), in: Capsule())
-
-                if inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    Button {
-                        // TODO: voice input
-                    } label: {
-                        Image(systemName: "mic.fill")
-                            .font(.title3)
-                            .foregroundStyle(Color.accentColor)
-                    }
-                } else {
-                    Button {
-                        sendMessage()
-                    } label: {
-                        Image(systemName: "arrow.up.circle.fill")
-                            .font(.title2)
-                            .foregroundStyle(Color.accentColor)
-                    }
-                    .disabled(isSending)
+        ScrollView {
+            LazyVStack(spacing: 16) {
+                ForEach(messages) { message in
+                    MessageCard(message: message)
                 }
             }
             .padding(.horizontal, 16)
-            .padding(.vertical, 10)
-            .background(.bar)
+            .padding(.vertical, 12)
+        }
+        .overlay {
+            if isLoading {
+                ProgressView()
+                    .tint(Color.accentColor)
+            }
+            if !isLoading && messages.isEmpty {
+                ContentUnavailableView(
+                    "Axis is watching",
+                    systemImage: "eye",
+                    description: Text("Messages will appear here.")
+                )
+            }
         }
         .navigationTitle("Axis")
         .navigationBarTitleDisplayMode(.inline)
-        .background(Color("AxisBackground"))
+        .scrollContentBackground(.hidden)
+        .background(Color.axisBackground)
         .task { await loadMessages() }
         .refreshable { await loadMessages() }
     }
@@ -88,84 +38,42 @@ struct ThreadView: View {
     private func loadMessages() async {
         do {
             messages = try await APIService.shared.request("/thread")
-            isLoading = false
-        } catch {
-            isLoading = false
-        }
-    }
-
-    private func sendMessage() {
-        let text = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !text.isEmpty else { return }
-        inputText = ""
-        isSending = true
-
-        // Show user's message immediately
-        let userMessage = ThreadMessage(
-            id: UUID(),
-            userId: UUID(),
-            sender: .user,
-            content: text,
-            contentType: .text,
-            actionType: nil,
-            actionPayload: nil,
-            urgency: nil,
-            surface: nil,
-            readAt: nil,
-            createdAt: Date()
-        )
-        messages.append(userMessage)
-
-        Task {
-            do {
-                let response: ThreadMessage = try await APIService.shared.request(
-                    "/thread",
-                    method: "POST",
-                    body: ["message": text]
-                )
-                messages.append(response)
-            } catch {
-                // Remove optimistic message and restore input on failure
-                messages.removeAll { $0.id == userMessage.id }
-                inputText = text
-            }
-            isSending = false
-        }
+        } catch { }
+        isLoading = false
     }
 }
 
-// MARK: - Message Bubble
+// MARK: - Message Card
 
-private struct MessageBubble: View {
+private struct MessageCard: View {
     let message: ThreadMessage
 
     var body: some View {
-        HStack {
-            if !message.isFromAxis { Spacer(minLength: 60) }
+        VStack(alignment: .leading, spacing: 10) {
+            // Category + timestamp
+            HStack {
+                Text(message.contentType.rawValue.replacingOccurrences(of: "_", with: " ").uppercased())
+                    .font(.caption.bold())
+                    .foregroundStyle(.secondary)
 
-            VStack(alignment: message.isFromAxis ? .leading : .trailing, spacing: 6) {
-                Text(message.content)
-                    .font(.body)
-                    .foregroundStyle(message.isFromAxis ? Color.primary : Color.white)
+                Spacer()
 
-                if message.isActionable {
-                    ActionButtons(message: message)
-                }
-
-                Text(message.createdAt, style: .time)
+                Text(message.createdAt, style: .relative)
                     .font(.caption2)
-                    .foregroundStyle(message.isFromAxis ? Color.secondary : Color.white.opacity(0.7))
+                    .foregroundStyle(.tertiary)
             }
-            .padding(12)
-            .background(
-                message.isFromAxis
-                    ? Color("AxisCard")
-                    : Color.accentColor,
-                in: RoundedRectangle(cornerRadius: 16)
-            )
 
-            if message.isFromAxis { Spacer(minLength: 60) }
+            // Content
+            Text(message.content)
+                .font(.body)
+
+            // Action buttons
+            if message.isActionable {
+                ActionButtons(message: message)
+            }
         }
+        .padding(16)
+        .background(Color.axisSurface1, in: RoundedRectangle(cornerRadius: 16))
     }
 }
 
@@ -202,7 +110,7 @@ private struct ActionChip: View {
                 .font(.caption.bold())
                 .padding(.horizontal, 10)
                 .padding(.vertical, 6)
-                .background(.ultraThinMaterial, in: Capsule())
+                .background(Color.accentColor.opacity(0.15), in: Capsule())
         }
         .buttonStyle(.plain)
     }

@@ -33,6 +33,8 @@
 		A10024 /* AxisTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20024 /* AxisTextField.swift */; };
 		A10025 /* AxisMark.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20025 /* AxisMark.swift */; };
 		A10026 /* AxisDivider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20026 /* AxisDivider.swift */; };
+		A10027 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20027 /* MainTabView.swift */; };
+		A10028 /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20028 /* SidebarView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -61,6 +63,8 @@
 		A20024 /* AxisTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AxisTextField.swift; sourceTree = "<group>"; };
 		A20025 /* AxisMark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AxisMark.swift; sourceTree = "<group>"; };
 		A20026 /* AxisDivider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AxisDivider.swift; sourceTree = "<group>"; };
+		A20027 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		A20028 /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
 		A30001 /* Axis.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Axis.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -90,6 +94,7 @@
 				A20001 /* AxisApp.swift */,
 				A20002 /* ContentView.swift */,
 				A50009 /* DesignSystem */,
+				A50011 /* Navigation */,
 				A50005 /* Models */,
 				A50002 /* Services */,
 				A50006 /* Views */,
@@ -173,6 +178,15 @@
 				A50010 /* Components */,
 			);
 			path = DesignSystem;
+			sourceTree = "<group>";
+		};
+		A50011 /* Navigation */ = {
+			isa = PBXGroup;
+			children = (
+				A20027 /* MainTabView.swift */,
+				A20028 /* SidebarView.swift */,
+			);
+			path = Navigation;
 			sourceTree = "<group>";
 		};
 		A50010 /* Components */ = {
@@ -287,6 +301,8 @@
 				A10024 /* AxisTextField.swift in Sources */,
 				A10025 /* AxisMark.swift in Sources */,
 				A10026 /* AxisDivider.swift in Sources */,
+				A10027 /* MainTabView.swift in Sources */,
+				A10028 /* SidebarView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

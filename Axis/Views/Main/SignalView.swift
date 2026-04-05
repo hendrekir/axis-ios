@@ -29,7 +29,7 @@ struct SignalView: View {
         }
         .navigationTitle("Situation")
         .scrollContentBackground(.hidden)
-        .background(Color("AxisBackground"))
+        .background(Color.axisBackground)
         .task { await loadSignals() }
         .refreshable { await loadSignals() }
     }
@@ -111,7 +111,7 @@ private struct SignalRow: View {
                             .font(.caption.bold())
                             .padding(.horizontal, 12)
                             .padding(.vertical, 6)
-                            .background(Color("AxisCard"), in: Capsule())
+                            .background(Color.axisSurface1, in: Capsule())
                     }
                     .buttonStyle(.plain)
                 }

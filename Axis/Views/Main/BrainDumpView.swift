@@ -1,11 +1,16 @@
 import SwiftUI
+import Speech
 
 struct BrainDumpView: View {
     @State private var text = ""
     @State private var isProcessing = false
-    @State private var result: BrainDumpResponse?
-    @State private var showResult = false
+    @State private var showConfirmation = false
+    @State private var isListening = false
     @FocusState private var isFocused: Bool
+
+    @State private var speechRecognizer = SFSpeechRecognizer()
+    @State private var recognitionTask: SFSpeechRecognitionTask?
+    @State private var audioEngine = AVAudioEngine()
 
     var body: some View {
         VStack(spacing: 0) {
@@ -13,9 +18,9 @@ struct BrainDumpView: View {
                 VStack(alignment: .leading, spacing: 20) {
                     // Header
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Brain Dump")
+                        Text("Capture")
                             .font(.title2.bold())
-                        Text("Get it out of your head. Axis will sort it.")
+                        Text("Thoughts, ideas, anything. Axis will make sense of it.")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -29,11 +34,11 @@ struct BrainDumpView: View {
                         .frame(minHeight: 200)
                         .scrollContentBackground(.hidden)
                         .padding(16)
-                        .background(Color("AxisCard"), in: RoundedRectangle(cornerRadius: 16))
+                        .background(Color.axisSurface1, in: RoundedRectangle(cornerRadius: 16))
                         .padding(.horizontal)
                         .overlay(alignment: .topLeading) {
-                            if text.isEmpty {
-                                Text("What's on your mind? Tasks, ideas, reminders, random thoughts...")
+                            if text.isEmpty && !isListening {
+                                Text("What's on your mind?")
                                     .foregroundStyle(.tertiary)
                                     .padding(.horizontal, 32)
                                     .padding(.top, 24)
@@ -44,18 +49,20 @@ struct BrainDumpView: View {
                     // Buttons
                     HStack(spacing: 12) {
                         Button {
-                            // TODO: voice input via Speech framework
+                            toggleSpeechRecognition()
                         } label: {
-                            Label("Voice", systemImage: "mic.fill")
+                            Label(isListening ? "Stop" : "Voice",
+                                  systemImage: isListening ? "stop.circle.fill" : "mic.fill")
                                 .frame(maxWidth: .infinity)
                         }
                         .buttonStyle(.bordered)
                         .controlSize(.large)
+                        .tint(isListening ? .red : nil)
 
                         Button {
                             submit()
                         } label: {
-                            Label("Process", systemImage: "sparkles")
+                            Label("Capture", systemImage: "arrow.up.circle.fill")
                                 .frame(maxWidth: .infinity)
                         }
                         .buttonStyle(.borderedProminent)
@@ -63,6 +70,15 @@ struct BrainDumpView: View {
                         .disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isProcessing)
                     }
                     .padding(.horizontal)
+
+                    // Confirmation
+                    if showConfirmation {
+                        Text("Got it.")
+                            .font(.body.bold())
+                            .foregroundStyle(Color.accentColor)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .transition(.opacity)
+                    }
                 }
                 .padding(.vertical)
             }
@@ -71,7 +87,8 @@ struct BrainDumpView: View {
             if isProcessing {
                 HStack(spacing: 8) {
                     ProgressView()
-                    Text("Axis is processing...")
+                        .tint(Color.accentColor)
+                    Text("Processing...")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
@@ -82,14 +99,10 @@ struct BrainDumpView: View {
         }
         .navigationTitle("Mind")
         .navigationBarTitleDisplayMode(.inline)
-        .background(Color("AxisBackground"))
-        .sheet(isPresented: $showResult) {
-            if let result {
-                BrainDumpResultSheet(result: result)
-            }
-        }
-        .onAppear { isFocused = true }
+        .background(Color.axisBackground)
     }
+
+    // MARK: - Submit
 
     private func submit() {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -99,63 +112,74 @@ struct BrainDumpView: View {
 
         Task {
             do {
-                let response: BrainDumpResponse = try await APIService.shared.request(
+                let _: BrainDumpResponse = try await APIService.shared.request(
                     "/brain-dump",
                     method: "POST",
                     body: ["content": trimmed]
                 )
-                result = response
-                text = ""
-                showResult = true
             } catch { }
+
+            text = ""
             isProcessing = false
+            withAnimation { showConfirmation = true }
+
+            try? await Task.sleep(for: .seconds(3))
+            withAnimation { showConfirmation = false }
         }
     }
-}
 
-// MARK: - Result Sheet
+    // MARK: - Speech Recognition
 
-private struct BrainDumpResultSheet: View {
-    let result: BrainDumpResponse
-    @Environment(\.dismiss) private var dismiss
+    private func toggleSpeechRecognition() {
+        if isListening {
+            stopListening()
+        } else {
+            startListening()
+        }
+    }
 
-    var body: some View {
-        NavigationStack {
-            List {
-                if !result.tasks.isEmpty {
-                    Section("Tasks created") {
-                        ForEach(result.tasks) { task in
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(task.title)
-                                    .font(.subheadline.bold())
-                                if let body = task.body {
-                                    Text(body)
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                        .lineLimit(2)
-                                }
-                            }
-                        }
-                    }
+    private func startListening() {
+        SFSpeechRecognizer.requestAuthorization { authStatus in
+            guard authStatus == .authorized else { return }
+
+            DispatchQueue.main.async {
+                guard let speechRecognizer, speechRecognizer.isAvailable else { return }
+
+                let request = SFSpeechAudioBufferRecognitionRequest()
+                request.shouldReportPartialResults = true
+
+                let inputNode = audioEngine.inputNode
+                let recordingFormat = inputNode.outputFormat(forBus: 0)
+                inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { buffer, _ in
+                    request.append(buffer)
                 }
 
-                if !result.threadMessages.isEmpty {
-                    Section("Added to thread") {
-                        ForEach(result.threadMessages) { msg in
-                            Text(msg.content)
-                                .font(.subheadline)
-                        }
-                    }
+                audioEngine.prepare()
+                do {
+                    try audioEngine.start()
+                    isListening = true
+                } catch {
+                    return
                 }
-            }
-            .navigationTitle("Processed")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
+
+                recognitionTask = speechRecognizer.recognitionTask(with: request) { result, error in
+                    if let result {
+                        text = result.bestTranscription.formattedString
+                    }
+                    if error != nil || (result?.isFinal ?? false) {
+                        stopListening()
+                    }
                 }
             }
         }
+    }
+
+    private func stopListening() {
+        audioEngine.stop()
+        audioEngine.inputNode.removeTap(onBus: 0)
+        recognitionTask?.cancel()
+        recognitionTask = nil
+        isListening = false
     }
 }
 

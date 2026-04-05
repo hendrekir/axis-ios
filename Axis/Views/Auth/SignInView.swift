@@ -3,57 +3,69 @@ import AuthenticationServices
 import ClerkKit
 
 struct SignInView: View {
-    @Environment(\.colorScheme) private var colorScheme
+    /// On simulator, this closure bypasses Clerk and goes straight to MainTabView.
+    var onSimulatorSignIn: (() -> Void)? = nil
+
     @State private var isSigningIn = false
     @State private var errorMessage: String?
 
     var body: some View {
-        VStack(spacing: 40) {
+        VStack(spacing: 0) {
             Spacer()
 
-            // Logo + tagline
-            VStack(spacing: 16) {
-                Image(systemName: "brain.head.profile")
-                    .font(.system(size: 72))
+            // Logo + branding
+            VStack(spacing: 20) {
+                Text("AXIS")
+                    .font(.system(size: 56, weight: .heavy, design: .default))
+                    .tracking(12)
                     .foregroundStyle(Color.accentColor)
 
-                Text("AXIS")
-                    .font(.system(size: 44, weight: .heavy))
-
                 Text("Be phone lazy.\nBe world productive.")
-                    .font(.title3)
+                    .font(.caption)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
             }
 
             Spacer()
 
-            // Sign in with Apple via Clerk
+            // Sign in section
             VStack(spacing: 16) {
-                SignInWithAppleButton(.signIn) { request in
-                    request.requestedScopes = [.fullName, .email]
-                } onCompletion: { _ in
-                    // Clerk handles the Apple credential flow directly,
-                    // but we keep the native button for the UI.
-                    // Actual auth happens in signInWithClerk() below.
+                #if targetEnvironment(simulator)
+                // Simulator: bypass Sign in with Apple (not supported)
+                Button {
+                    onSimulatorSignIn?()
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "person.fill")
+                        Text("Continue as Test User")
+                            .font(.body.bold())
+                    }
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 54)
+                    .background(Color.accentColor, in: RoundedRectangle(cornerRadius: 12))
+                    .foregroundStyle(.white)
                 }
-                .signInWithAppleButtonStyle(colorScheme == .dark ? .white : .black)
-                .frame(height: 54)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-                .allowsHitTesting(false) // Disable native — overlay handles tap
-
-                .overlay {
-                    // Invisible tap target that calls Clerk's flow
-                    Color.clear
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            signInWithClerk()
-                        }
+                #else
+                // Device: real Sign in with Apple via Clerk
+                Button {
+                    signInWithClerk()
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "apple.logo")
+                        Text("Continue with Apple")
+                            .font(.body.bold())
+                    }
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 54)
+                    .background(Color.accentColor, in: RoundedRectangle(cornerRadius: 12))
+                    .foregroundStyle(.white)
                 }
+                .disabled(isSigningIn)
+                #endif
 
                 if isSigningIn {
                     ProgressView()
-                        .padding(.top, 4)
+                        .tint(Color.accentColor)
                 }
 
                 if let errorMessage {
@@ -64,7 +76,9 @@ struct SignInView: View {
                 }
             }
             .padding(.horizontal, 32)
-            .disabled(isSigningIn)
+
+            Spacer()
+                .frame(height: 40)
 
             // Terms
             Text("By signing in you agree to the Terms of Service and Privacy Policy.")
@@ -74,27 +88,19 @@ struct SignInView: View {
                 .padding(.horizontal, 48)
                 .padding(.bottom, 24)
         }
-        .background(Color("AxisBackground"))
+        .background(Color.axisBackground)
     }
 
+    #if !targetEnvironment(simulator)
     private func signInWithClerk() {
         isSigningIn = true
         errorMessage = nil
 
         Task {
             do {
-                // Clerk handles the full Apple Sign-In flow:
-                // presents the Apple sheet, extracts the ID token,
-                // creates or signs in the user, and activates the session.
                 try await Clerk.shared.auth.signInWithApple()
-
-                // Grab the session token and cache in Keychain for APIService
-                if let token = try await Clerk.shared.auth.getToken() {
-                    KeychainService.shared.set(.clerkJWT, value: token)
-                }
             } catch {
                 let nsError = error as NSError
-                // Don't show error for user cancellation
                 if nsError.domain == ASAuthorizationErrorDomain
                     && nsError.code == ASAuthorizationError.canceled.rawValue {
                     // User cancelled — silent
@@ -105,6 +111,7 @@ struct SignInView: View {
             isSigningIn = false
         }
     }
+    #endif
 }
 
 #Preview {

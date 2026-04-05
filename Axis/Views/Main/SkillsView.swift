@@ -23,7 +23,7 @@ struct SkillsView: View {
         }
         .navigationTitle("Skills")
         .scrollContentBackground(.hidden)
-        .background(Color("AxisBackground"))
+        .background(Color.axisBackground)
         .task { await loadSkills() }
         .refreshable { await loadSkills() }
     }
@@ -83,7 +83,7 @@ private struct SkillCard: View {
         }
         .padding(16)
         .frame(maxWidth: .infinity)
-        .background(Color("AxisCard"), in: RoundedRectangle(cornerRadius: 16))
+        .background(Color.axisSurface1, in: RoundedRectangle(cornerRadius: 16))
     }
 }
 
