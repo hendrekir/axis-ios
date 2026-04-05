@@ -5,6 +5,10 @@ struct SituationView: View {
     @State private var signals: [Signal] = []
     @State private var isLoading = true
     @State private var loadFailed = false
+    @State private var showContextSetup = false
+    @State private var contextText = ""
+    @State private var isSavingContext = false
+    @State private var contextSaved = false
 
     private var currentGreeting: String {
         let hour = Calendar.current.component(.hour, from: Date())
@@ -70,9 +74,17 @@ struct SituationView: View {
             if isLoading {
                 SituationLoadingView()
             }
-            if !isLoading && brief == nil && signals.isEmpty {
+            if !isLoading && brief == nil && signals.isEmpty && !showContextSetup {
                 SituationEmptyView(loadFailed: loadFailed)
             }
+        }
+        .sheet(isPresented: $showContextSetup) {
+            ContextSetupSheet(
+                contextText: $contextText,
+                isSaving: $isSavingContext,
+                saved: $contextSaved,
+                onSave: { await saveContext() }
+            )
         }
         .task { await loadData() }
         .refreshable { await loadData() }
@@ -89,6 +101,33 @@ struct SituationView: View {
         brief = await briefResult
         signals = await signalsResult
         isLoading = false
+
+        // Simulator: if no data after load, prompt context setup after 3s
+        #if targetEnvironment(simulator)
+        if brief == nil && signals.isEmpty && !contextSaved {
+            try? await Task.sleep(for: .seconds(3))
+            if brief == nil && signals.isEmpty {
+                showContextSetup = true
+            }
+        }
+        #endif
+    }
+
+    private func saveContext() async {
+        isSavingContext = true
+        do {
+            let payload = ContextSetupPayload(
+                contextNotes: contextText,
+                timezone: TimeZone.current.identifier
+            )
+            try await APIService.shared.requestVoid("/me", method: "PATCH", body: payload)
+            contextSaved = true
+            showContextSetup = false
+            // Reload to pick up any new signals generated from context
+            isLoading = true
+            await loadData()
+        } catch { }
+        isSavingContext = false
     }
 
     private func completeSignal(_ signal: Signal) async {
@@ -318,5 +357,91 @@ private struct SituationEmptyView: View {
                 ? "Pull down to try again."
                 : "No signals right now. Axis is watching.")
         )
+    }
+}
+
+// MARK: - Context Setup Sheet (Simulator onboarding)
+
+private struct ContextSetupSheet: View {
+    @Binding var contextText: String
+    @Binding var isSaving: Bool
+    @Binding var saved: Bool
+    let onSave: () async -> Void
+
+    var body: some View {
+        NavigationStack {
+            VStack(alignment: .leading, spacing: AxisSpacing.base) {
+                VStack(alignment: .leading, spacing: AxisSpacing.sm) {
+                    Text("Set up context")
+                        .font(.axisSyne(22))
+                        .foregroundColor(.axisTextPrimary)
+                    Text("Tell Axis about your work, projects, goals, and the people that matter. This seeds the dispatch job with real data.")
+                        .font(.axisBody2)
+                        .foregroundColor(.axisTextSecondary)
+                        .lineSpacing(3)
+                }
+
+                TextEditor(text: $contextText)
+                    .font(.axisBody1)
+                    .foregroundColor(.axisTextPrimary)
+                    .scrollContentBackground(.hidden)
+                    .padding(12)
+                    .frame(minHeight: 160)
+                    .background(Color.axisSurface2)
+                    .cornerRadius(AxisRadius.md)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: AxisRadius.md)
+                            .stroke(Color.axisBorderInput, lineWidth: 0.5)
+                    )
+                    .overlay(alignment: .topLeading) {
+                        if contextText.isEmpty {
+                            Text("Your work, projects, goals, the people that matter...")
+                                .font(.axisBody1)
+                                .foregroundColor(.axisTextMuted)
+                                .padding(16)
+                                .allowsHitTesting(false)
+                        }
+                    }
+
+                Button {
+                    Task { await onSave() }
+                } label: {
+                    HStack {
+                        if isSaving {
+                            ProgressView()
+                                .tint(.white)
+                                .scaleEffect(0.8)
+                        }
+                        Text(isSaving ? "Saving..." : "Save context")
+                    }
+                    .font(.axisBody(15, weight: .medium))
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(contextText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                        ? Color.axisViolet.opacity(0.4)
+                        : Color.axisViolet)
+                    .cornerRadius(AxisRadius.md)
+                }
+                .buttonStyle(.plain)
+                .disabled(contextText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSaving)
+
+                Spacer()
+            }
+            .padding(AxisSpacing.base)
+            .background(Color.axisBackground)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Skip") {
+                        saved = true
+                    }
+                    .font(.axisBody2)
+                    .foregroundColor(.axisTextSecondary)
+                }
+            }
+        }
+        .presentationDetents([.medium, .large])
+        .presentationDragIndicator(.visible)
     }
 }

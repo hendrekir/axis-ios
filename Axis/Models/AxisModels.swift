@@ -178,6 +178,11 @@ struct ContextNotesRequest: Encodable {
     let notes: String
 }
 
+struct ContextSetupPayload: Encodable {
+    let contextNotes: String
+    let timezone: String
+}
+
 // MARK: - Connection
 
 struct Connection: Codable, Identifiable {
