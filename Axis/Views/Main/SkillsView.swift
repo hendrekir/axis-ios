@@ -68,14 +68,14 @@ private struct SkillCard: View {
                     .multilineTextAlignment(.center)
             }
 
-            if skill.requiresOAuth && !skill.isConnected {
-                Text("Connect")
+            if !skill.isConnected {
+                Text("Inactive")
                     .font(.caption.bold())
-                    .foregroundStyle(Color.accentColor)
+                    .foregroundStyle(Color.secondary)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 4)
-                    .background(Color.accentColor.opacity(0.12), in: Capsule())
-            } else if skill.isConnected {
+                    .background(Color.secondary.opacity(0.12), in: Capsule())
+            } else {
                 Image(systemName: "checkmark.circle.fill")
                     .foregroundStyle(.green)
                     .font(.caption)

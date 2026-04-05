@@ -117,10 +117,26 @@ struct Skill: Codable, Identifiable {
     let id: UUID
     let name: String
     let description: String
-    let icon: String
-    let category: String
-    let isConnected: Bool
-    let requiresOAuth: Bool
+    let isBuiltin: Bool
+    let isActive: Bool
+    let dataSources: [String]?
+    let reasoningModel: String?
+    let triggerType: String?
+    let outputRouting: String?
+    let systemPrompt: String?
+
+    var isConnected: Bool { isActive }
+
+    var icon: String {
+        let lower = name.lowercased()
+        if lower.contains("email") || lower.contains("gmail") { return "envelope.fill" }
+        if lower.contains("calendar") { return "calendar" }
+        if lower.contains("finance") || lower.contains("invoice") { return "dollarsign.circle.fill" }
+        if lower.contains("research") { return "magnifyingglass" }
+        if lower.contains("entertainment") || lower.contains("music") { return "music.note" }
+        if lower.contains("morning") || lower.contains("brief") { return "sun.max.fill" }
+        return "cpu"
+    }
 }
 
 // MARK: - Brief
