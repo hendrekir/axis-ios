@@ -16,7 +16,7 @@ struct BrainDumpView: View {
                         Text("Brain Dump")
                             .font(.title2.bold())
                         Text("Get it out of your head. Axis will sort it.")
-                            .font(.subheadline)
+                            .font(.caption)
                             .foregroundStyle(.secondary)
                     }
                     .padding(.horizontal)
@@ -95,11 +95,10 @@ struct BrainDumpView: View {
 
         Task {
             do {
-                let body = BrainDumpRequest(text: trimmed, source: "text")
                 let response: BrainDumpResponse = try await APIService.shared.request(
                     "/brain-dump",
                     method: "POST",
-                    body: body
+                    body: ["content": trimmed]
                 )
                 result = response
                 text = ""

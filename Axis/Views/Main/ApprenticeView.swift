@@ -12,7 +12,7 @@ struct ApprenticeView: View {
                     Text("Apprentice")
                         .font(.title2.bold())
                     Text("What Axis has learned about you this week.")
-                        .font(.subheadline)
+                        .font(.caption)
                         .foregroundStyle(.secondary)
                 }
                 .padding(.horizontal)
@@ -35,6 +35,8 @@ struct ApprenticeView: View {
         .overlay { if isLoading { ProgressView() } }
         .navigationTitle("Apprentice")
         .navigationBarTitleDisplayMode(.inline)
+        .scrollContentBackground(.hidden)
+        .background(Color("AxisBackground"))
         .task { await loadInsights() }
         .refreshable { await loadInsights() }
     }
@@ -67,10 +69,10 @@ private struct InsightCard: View {
             }
 
             Text(insight.title)
-                .font(.headline)
+                .font(.body.bold())
 
             Text(insight.body)
-                .font(.subheadline)
+                .font(.body)
                 .foregroundStyle(.secondary)
         }
         .padding(16)

@@ -97,16 +97,34 @@ struct ThreadView: View {
         inputText = ""
         isSending = true
 
+        // Show user's message immediately
+        let userMessage = ThreadMessage(
+            id: UUID(),
+            userId: UUID(),
+            sender: .user,
+            content: text,
+            contentType: .text,
+            actionType: nil,
+            actionPayload: nil,
+            urgency: nil,
+            surface: nil,
+            readAt: nil,
+            createdAt: Date()
+        )
+        messages.append(userMessage)
+
         Task {
             do {
                 let response: ThreadMessage = try await APIService.shared.request(
                     "/thread",
                     method: "POST",
-                    body: ["content": text]
+                    body: ["message": text]
                 )
                 messages.append(response)
             } catch {
-                inputText = text // restore on failure
+                // Remove optimistic message and restore input on failure
+                messages.removeAll { $0.id == userMessage.id }
+                inputText = text
             }
             isSending = false
         }
@@ -138,7 +156,7 @@ private struct MessageBubble: View {
             .padding(12)
             .background(
                 message.isFromAxis
-                    ? Color(.systemGray6)
+                    ? Color("AxisCard")
                     : Color.accentColor,
                 in: RoundedRectangle(cornerRadius: 16)
             )

@@ -22,6 +22,8 @@ struct SkillsView: View {
             if isLoading { ProgressView() }
         }
         .navigationTitle("Skills")
+        .scrollContentBackground(.hidden)
+        .background(Color("AxisBackground"))
         .task { await loadSkills() }
         .refreshable { await loadSkills() }
     }

@@ -130,12 +130,22 @@ struct Brief: Codable, Identifiable {
     let userId: UUID
     let messages: [BriefMessage]
     let silentCount: Int
+    let calendarEvents: [CalendarEvent]?
+    let gmailConnected: Bool?
     let generatedAt: Date
 
     struct BriefMessage: Codable, Identifiable {
         let id: UUID
         let content: String
         let category: String?
+    }
+
+    struct CalendarEvent: Codable, Identifiable {
+        let id: UUID
+        let title: String
+        let startTime: Date
+        let endTime: Date?
+        let location: String?
     }
 }
 

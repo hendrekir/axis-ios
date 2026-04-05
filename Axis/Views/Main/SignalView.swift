@@ -82,11 +82,11 @@ private struct SignalRow: View {
             }
 
             Text(signal.title)
-                .font(.headline)
+                .font(.body.bold())
 
             if let body = signal.body {
                 Text(body)
-                    .font(.subheadline)
+                    .font(.body)
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
             }
