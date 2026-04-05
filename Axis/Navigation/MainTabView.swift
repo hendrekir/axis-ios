@@ -41,7 +41,7 @@ struct MainTabView: View {
                 .tag(1)
 
                 NavigationStack {
-                    BrainDumpView()
+                    MindView()
                         .toolbar {
                             ToolbarItem(placement: .navigationBarLeading) {
                                 Button(action: { withAnimation(.easeInOut(duration: 0.25)) { sidebarVisible.toggle() } }) {
