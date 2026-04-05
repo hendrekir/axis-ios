@@ -43,7 +43,7 @@ struct SidebarView: View {
             .background(Color.axisSurface1)
 
             Color.black.opacity(0.5)
-                .onTapGesture { withAnimation(.easeInOut(duration: 0.25)) { isVisible = false } }
+                .onTapGesture { isVisible = false }
         }
         .ignoresSafeArea()
         .sheet(item: $activeDestination) { destination in

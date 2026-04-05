@@ -12,7 +12,7 @@ struct MainTabView: View {
                     SituationView()
                         .toolbar {
                             ToolbarItem(placement: .navigationBarLeading) {
-                                Button(action: { withAnimation(.easeInOut(duration: 0.25)) { sidebarVisible.toggle() } }) {
+                                Button(action: { sidebarVisible.toggle() }) {
                                     Image(systemName: "line.3.horizontal")
                                         .foregroundColor(.axisTextSecondary)
                                 }
@@ -28,7 +28,7 @@ struct MainTabView: View {
                     ThreadView()
                         .toolbar {
                             ToolbarItem(placement: .navigationBarLeading) {
-                                Button(action: { withAnimation(.easeInOut(duration: 0.25)) { sidebarVisible.toggle() } }) {
+                                Button(action: { sidebarVisible.toggle() }) {
                                     Image(systemName: "line.3.horizontal")
                                         .foregroundColor(.axisTextSecondary)
                                 }
@@ -44,7 +44,7 @@ struct MainTabView: View {
                     MindView()
                         .toolbar {
                             ToolbarItem(placement: .navigationBarLeading) {
-                                Button(action: { withAnimation(.easeInOut(duration: 0.25)) { sidebarVisible.toggle() } }) {
+                                Button(action: { sidebarVisible.toggle() }) {
                                     Image(systemName: "line.3.horizontal")
                                         .foregroundColor(.axisTextSecondary)
                                 }
@@ -60,7 +60,7 @@ struct MainTabView: View {
                     BriefView()
                         .toolbar {
                             ToolbarItem(placement: .navigationBarLeading) {
-                                Button(action: { withAnimation(.easeInOut(duration: 0.25)) { sidebarVisible.toggle() } }) {
+                                Button(action: { sidebarVisible.toggle() }) {
                                     Image(systemName: "line.3.horizontal")
                                         .foregroundColor(.axisTextSecondary)
                                 }
@@ -82,6 +82,7 @@ struct MainTabView: View {
                     .zIndex(1)
             }
         }
+        .animation(.easeInOut(duration: 0.25), value: sidebarVisible)
         .preferredColorScheme(.dark)
     }
 }
