@@ -1,113 +1,90 @@
 import SwiftUI
-import UserNotifications
 
-struct Step4Permissions: View {
-    @State private var notificationsGranted = false
-    @State private var locationGranted = false
-    @State private var healthGranted = false
-    @State private var contactsGranted = false
-
+struct Step4Privacy: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
                 Spacer().frame(height: 56)
 
-                Text("One-time setup.")
+                Text("What Axis reads.")
                     .font(.axisSyne(28))
+                    .foregroundColor(.white)
+
+                Spacer().frame(height: AxisSpacing.xl)
+
+                // What Axis reads
+                VStack(alignment: .leading, spacing: AxisSpacing.sm) {
+                    PrivacyRow(icon: "envelope.fill", text: "Email subjects and content (when connected)")
+                    PrivacyRow(icon: "calendar", text: "Calendar events and attendees")
+                    PrivacyRow(icon: "bubble.left.fill", text: "What you capture and tell Axis")
+                    PrivacyRow(icon: "brain.head.profile", text: "Patterns it learns from your behaviour")
+                }
+
+                Spacer().frame(height: AxisSpacing.xxl)
+
+                Text("What Axis never does.")
+                    .font(.axisSyne(22))
                     .foregroundColor(.white)
 
                 Spacer().frame(height: AxisSpacing.md)
 
-                Text("These let Axis work without you having to think about it.")
-                    .font(.axisBody1)
-                    .foregroundColor(.axisTextSecondary)
-                    .lineSpacing(4)
+                VStack(alignment: .leading, spacing: AxisSpacing.sm) {
+                    NeverRow(text: "Sell or share your data with anyone")
+                    NeverRow(text: "Send anything without your approval")
+                    NeverRow(text: "Act on its own — you always confirm")
+                    NeverRow(text: "Train models on your personal data")
+                }
 
-                Spacer().frame(height: AxisSpacing.xl)
+                Spacer().frame(height: AxisSpacing.xxl)
 
-                VStack(spacing: AxisSpacing.sm) {
-                    PermissionCard(
-                        emoji: "🔔",
-                        title: "Notifications",
-                        subtitle: "The main way Axis reaches you",
-                        granted: notificationsGranted,
-                        onRequest: requestNotifications
-                    )
-                    PermissionCard(
-                        emoji: "📍",
-                        title: "Location",
-                        subtitle: "Auto-switch modes when you arrive",
-                        granted: locationGranted,
-                        onRequest: { locationGranted = true }
-                    )
-                    PermissionCard(
-                        emoji: "❤️",
-                        title: "Health",
-                        subtitle: "Route tasks by your energy level",
-                        granted: healthGranted,
-                        onRequest: { healthGranted = true }
-                    )
-                    PermissionCard(
-                        emoji: "👥",
-                        title: "Contacts",
-                        subtitle: "Know who matters in your email",
-                        granted: contactsGranted,
-                        onRequest: { contactsGranted = true }
-                    )
+                Link(destination: URL(string: "https://tryaxis.app/privacy")!) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "lock.shield")
+                            .font(.system(size: 13))
+                        Text("Read full privacy policy")
+                            .font(.axisBody2)
+                    }
+                    .foregroundColor(.axisViolet)
                 }
             }
             .padding(.horizontal, AxisSpacing.xxl)
         }
     }
+}
 
-    private func requestNotifications() {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, _ in
-            DispatchQueue.main.async {
-                notificationsGranted = granted
-            }
+private struct PrivacyRow: View {
+    let icon: String
+    let text: String
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 14))
+                .foregroundColor(.axisViolet)
+                .frame(width: 20)
+            Text(text)
+                .font(.axisBody1)
+                .foregroundColor(.axisTextSecondary)
+                .lineSpacing(3)
         }
+        .padding(.vertical, 4)
     }
 }
 
-private struct PermissionCard: View {
-    let emoji: String
-    let title: String
-    let subtitle: String
-    let granted: Bool
-    let onRequest: () -> Void
+private struct NeverRow: View {
+    let text: String
 
     var body: some View {
-        Button(action: { if !granted { onRequest() } }) {
-            AxisCard {
-                HStack(spacing: AxisSpacing.md) {
-                    Text(emoji)
-                        .font(.system(size: 24))
-
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text(title)
-                            .font(.axisH2)
-                            .foregroundColor(.axisTextPrimary)
-                        Text(subtitle)
-                            .font(.axisBody2)
-                            .foregroundColor(.axisTextSecondary)
-                    }
-
-                    Spacer()
-
-                    ZStack {
-                        Circle()
-                            .stroke(granted ? Color.axisGreen : Color.axisBorderStrong, lineWidth: 1.5)
-                            .frame(width: 22, height: 22)
-                        if granted {
-                            Circle()
-                                .fill(Color.axisGreen)
-                                .frame(width: 14, height: 14)
-                        }
-                    }
-                }
-                .padding(14)
-            }
+        HStack(spacing: 12) {
+            Image(systemName: "xmark")
+                .font(.system(size: 12, weight: .bold))
+                .foregroundColor(.axisRed)
+                .frame(width: 20)
+            Text(text)
+                .font(.axisBody1)
+                .foregroundColor(.axisTextSecondary)
+                .lineSpacing(3)
         }
-        .buttonStyle(.plain)
+        .padding(.vertical, 4)
     }
 }

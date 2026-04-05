@@ -179,6 +179,12 @@ struct InteractionLog: Encodable {
     let mode: String?
 }
 
+// MARK: - Capture
+
+struct CaptureRequest: Encodable {
+    let content: String
+}
+
 // MARK: - Context Notes
 
 struct ContextNotesRequest: Encodable {

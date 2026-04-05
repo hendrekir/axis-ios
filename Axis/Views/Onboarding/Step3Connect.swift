@@ -1,85 +1,71 @@
 import SwiftUI
 
-struct Step3Connect: View {
+struct Step3Confirmation: View {
+    var onAddMore: () -> Void
+    var onContinue: () -> Void
+    @State private var cardVisible = false
+
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 0) {
-                Spacer().frame(height: 56)
+        VStack(spacing: 0) {
+            Spacer()
 
-                Text("Connect your inbox.")
-                    .font(.axisSyne(28))
-                    .foregroundColor(.white)
+            // Confirmation card
+            VStack(spacing: AxisSpacing.xl) {
+                // Checkmark
+                ZStack {
+                    Circle()
+                        .fill(Color.axisGreenDim)
+                        .frame(width: 64, height: 64)
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 24, weight: .semibold))
+                        .foregroundColor(.axisGreen)
+                }
+                .scaleEffect(cardVisible ? 1.0 : 0.6)
+                .opacity(cardVisible ? 1.0 : 0)
 
-                Spacer().frame(height: AxisSpacing.md)
+                Text("Axis caught that.")
+                    .font(.axisSyne(24))
+                    .foregroundColor(.axisTextPrimary)
+                    .opacity(cardVisible ? 1.0 : 0)
 
-                Text("Axis reads your email, ranks what matters, and drafts replies in your voice.")
+                Text("It'll surface it at the right moment — not a fixed reminder you'll dismiss, the actual right time based on your day.")
                     .font(.axisBody1)
                     .foregroundColor(.axisTextSecondary)
+                    .multilineTextAlignment(.center)
                     .lineSpacing(6)
+                    .padding(.horizontal, AxisSpacing.base)
+                    .opacity(cardVisible ? 1.0 : 0)
+            }
 
-                Spacer().frame(height: AxisSpacing.xxl)
+            Spacer()
 
-                // Gmail connect card
-                ConnectServiceCard(
-                    icon: "envelope.fill",
-                    name: "Connect Gmail",
-                    description: "Read + send email on your behalf"
-                )
+            // Buttons
+            VStack(spacing: AxisSpacing.sm) {
+                // Progress dots
+                HStack(spacing: AxisSpacing.sm) {
+                    ForEach(0..<6, id: \.self) { index in
+                        Circle()
+                            .fill(index == 2 ? Color.white : Color.axisVioletBorder)
+                            .frame(width: 8, height: 8)
+                    }
+                }
+                .padding(.bottom, AxisSpacing.sm)
 
-                Spacer().frame(height: AxisSpacing.base)
+                AxisSecondaryButton(title: "Add more") {
+                    onAddMore()
+                }
 
-                // Calendar connect card
-                ConnectServiceCard(
-                    icon: "calendar",
-                    name: "Connect Google Calendar",
-                    description: "Meeting prep + conflict detection"
-                )
-
-                Spacer().frame(height: AxisSpacing.base)
-
-                // Skip
-                Button("Skip for now →") { }
-                    .font(.axisBody2)
-                    .foregroundColor(.axisTextMuted)
-                    .frame(maxWidth: .infinity, alignment: .center)
+                AxisPrimaryButton(title: "Continue") {
+                    onContinue()
+                }
             }
             .padding(.horizontal, AxisSpacing.xxl)
+            .padding(.bottom, AxisSpacing.xl)
         }
-    }
-}
-
-private struct ConnectServiceCard: View {
-    let icon: String
-    let name: String
-    let description: String
-
-    var body: some View {
-        AxisCard(elevated: true) {
-            VStack(alignment: .leading, spacing: AxisSpacing.md) {
-                Image(systemName: icon)
-                    .font(.system(size: 24))
-                    .foregroundColor(.axisViolet)
-
-                Text(name)
-                    .font(.axisH1)
-                    .foregroundColor(.axisTextPrimary)
-
-                Text(description)
-                    .font(.axisBody2)
-                    .foregroundColor(.axisTextSecondary)
-
-                Button(action: { }) {
-                    Text("Connect")
-                        .font(.axisBody(15, weight: .medium))
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 44)
-                        .background(Color.axisViolet)
-                        .cornerRadius(AxisRadius.md)
-                }
-                .buttonStyle(.plain)
+        .onAppear {
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.7).delay(0.2)) {
+                cardVisible = true
             }
-            .padding(AxisSpacing.base)
         }
     }
 }

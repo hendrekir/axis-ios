@@ -42,6 +42,7 @@
 		A10033 /* Step3Connect.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20033 /* Step3Connect.swift */; };
 		A10034 /* Step4Permissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20034 /* Step4Permissions.swift */; };
 		A10035 /* Step5Ready.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20035 /* Step5Ready.swift */; };
+		A10060 /* Step6Ready.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20060 /* Step6Ready.swift */; };
 		A10036 /* MindView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20036 /* MindView.swift */; };
 /* End PBXBuildFile section */
 
@@ -80,6 +81,7 @@
 		A20033 /* Step3Connect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Step3Connect.swift; sourceTree = "<group>"; };
 		A20034 /* Step4Permissions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Step4Permissions.swift; sourceTree = "<group>"; };
 		A20035 /* Step5Ready.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Step5Ready.swift; sourceTree = "<group>"; };
+		A20060 /* Step6Ready.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Step6Ready.swift; sourceTree = "<group>"; };
 		A20036 /* MindView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindView.swift; sourceTree = "<group>"; };
 		A30001 /* Axis.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Axis.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -181,6 +183,7 @@
 				A20033 /* Step3Connect.swift */,
 				A20034 /* Step4Permissions.swift */,
 				A20035 /* Step5Ready.swift */,
+				A20060 /* Step6Ready.swift */,
 			);
 			path = Onboarding;
 			sourceTree = "<group>";
@@ -342,6 +345,7 @@
 				A10033 /* Step3Connect.swift in Sources */,
 				A10034 /* Step4Permissions.swift in Sources */,
 				A10035 /* Step5Ready.swift in Sources */,
+				A10060 /* Step6Ready.swift in Sources */,
 				A10036 /* MindView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
