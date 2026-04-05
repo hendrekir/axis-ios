@@ -79,6 +79,7 @@ struct MainTabView: View {
             if sidebarVisible {
                 SidebarView(isVisible: $sidebarVisible, onSignedOut: onSignedOut)
                     .transition(.move(edge: .leading))
+                    .zIndex(1)
             }
         }
         .preferredColorScheme(.dark)

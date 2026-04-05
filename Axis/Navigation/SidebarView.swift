@@ -41,12 +41,6 @@ struct SidebarView: View {
             }
             .frame(width: min(UIScreen.main.bounds.width * 0.8, 320))
             .background(Color.axisSurface1)
-            .overlay(
-                Rectangle()
-                    .fill(Color.axisBorderDefault)
-                    .frame(width: 0.5),
-                alignment: .trailing
-            )
 
             Color.black.opacity(0.5)
                 .onTapGesture { withAnimation(.easeInOut(duration: 0.25)) { isVisible = false } }
