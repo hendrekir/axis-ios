@@ -9,7 +9,7 @@ struct MainTabView: View {
         ZStack(alignment: .leading) {
             TabView(selection: $selectedTab) {
                 NavigationStack {
-                    SignalView()
+                    SituationView()
                         .toolbar {
                             ToolbarItem(placement: .navigationBarLeading) {
                                 Button(action: { withAnimation(.easeInOut(duration: 0.25)) { sidebarVisible.toggle() } }) {
