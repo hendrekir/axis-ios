@@ -4,20 +4,20 @@ extension Font {
     // DISPLAY — Syne ExtraBold 800
     // Used for: screen titles, hero numbers, score displays
     static func axisSyne(_ size: CGFloat) -> Font {
-        Font.custom("Syne-ExtraBold", size: size)
+        Font.custom("Syne-ExtraBold", size: size, relativeTo: .title)
     }
 
     // BODY — Instrument Sans
     // Used for: body copy, labels, thread messages, descriptions
     static func axisBody(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {
         let name = weight == .medium ? "InstrumentSans-Medium" : "InstrumentSans-Regular"
-        return Font.custom(name, size: size)
+        return Font.custom(name, size: size, relativeTo: .body)
     }
 
     // MONO — JetBrains Mono
     // Used for: timestamps, system data, version numbers, stats
     static func axisMono(_ size: CGFloat) -> Font {
-        Font.custom("JetBrainsMono-Medium", size: size)
+        Font.custom("JetBrainsMono-Medium", size: size, relativeTo: .caption)
     }
 
     // PREDEFINED SCALES

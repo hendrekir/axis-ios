@@ -11,6 +11,23 @@ struct ContentView: View {
     }
 }
 
+// MARK: - Onboarding Gate
+
+struct OnboardingGate: View {
+    var onSignedOut: () -> Void
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
+
+    var body: some View {
+        if hasCompletedOnboarding {
+            MainTabView(onSignedOut: onSignedOut)
+        } else {
+            OnboardingFlow(onComplete: {
+                hasCompletedOnboarding = true
+            })
+        }
+    }
+}
+
 // MARK: - Simulator Gate (bypass Clerk, Sign in with Apple not supported)
 
 struct SimulatorGate: View {
@@ -18,7 +35,7 @@ struct SimulatorGate: View {
 
     var body: some View {
         if isSignedIn {
-            MainTabView(onSignedOut: {
+            OnboardingGate(onSignedOut: {
                 isSignedIn = false
             })
         } else {
@@ -46,7 +63,7 @@ struct AuthGate: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .background(Color.axisBackground)
             } else if isSignedIn {
-                MainTabView(onSignedOut: {
+                OnboardingGate(onSignedOut: {
                     Task {
                         try? await Clerk.shared.session?.revoke()
                     }

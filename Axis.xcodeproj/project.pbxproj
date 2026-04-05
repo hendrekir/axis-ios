@@ -36,6 +36,12 @@
 		A10027 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20027 /* MainTabView.swift */; };
 		A10028 /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20028 /* SidebarView.swift */; };
 		A10029 /* SituationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20029 /* SituationView.swift */; };
+		A10030 /* OnboardingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20030 /* OnboardingFlow.swift */; };
+		A10031 /* Step1Welcome.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20031 /* Step1Welcome.swift */; };
+		A10032 /* Step2Capture.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20032 /* Step2Capture.swift */; };
+		A10033 /* Step3Connect.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20033 /* Step3Connect.swift */; };
+		A10034 /* Step4Permissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20034 /* Step4Permissions.swift */; };
+		A10035 /* Step5Ready.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20035 /* Step5Ready.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -67,6 +73,12 @@
 		A20027 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		A20028 /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
 		A20029 /* SituationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SituationView.swift; sourceTree = "<group>"; };
+		A20030 /* OnboardingFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingFlow.swift; sourceTree = "<group>"; };
+		A20031 /* Step1Welcome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Step1Welcome.swift; sourceTree = "<group>"; };
+		A20032 /* Step2Capture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Step2Capture.swift; sourceTree = "<group>"; };
+		A20033 /* Step3Connect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Step3Connect.swift; sourceTree = "<group>"; };
+		A20034 /* Step4Permissions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Step4Permissions.swift; sourceTree = "<group>"; };
+		A20035 /* Step5Ready.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Step5Ready.swift; sourceTree = "<group>"; };
 		A30001 /* Axis.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Axis.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -145,6 +157,7 @@
 				A20017 /* ViewExtensions.swift */,
 				A50007 /* Auth */,
 				A50008 /* Main */,
+				A50012 /* Onboarding */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -155,6 +168,19 @@
 				A20008 /* SignInView.swift */,
 			);
 			path = Auth;
+			sourceTree = "<group>";
+		};
+		A50012 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				A20030 /* OnboardingFlow.swift */,
+				A20031 /* Step1Welcome.swift */,
+				A20032 /* Step2Capture.swift */,
+				A20033 /* Step3Connect.swift */,
+				A20034 /* Step4Permissions.swift */,
+				A20035 /* Step5Ready.swift */,
+			);
+			path = Onboarding;
 			sourceTree = "<group>";
 		};
 		A50008 /* Main */ = {
@@ -307,6 +333,12 @@
 				A10027 /* MainTabView.swift in Sources */,
 				A10028 /* SidebarView.swift in Sources */,
 				A10029 /* SituationView.swift in Sources */,
+				A10030 /* OnboardingFlow.swift in Sources */,
+				A10031 /* Step1Welcome.swift in Sources */,
+				A10032 /* Step2Capture.swift in Sources */,
+				A10033 /* Step3Connect.swift in Sources */,
+				A10034 /* Step4Permissions.swift in Sources */,
+				A10035 /* Step5Ready.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
