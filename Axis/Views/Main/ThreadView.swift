@@ -65,26 +65,21 @@ struct ThreadView: View {
         // Optimistic: add user message immediately
         let optimistic = ThreadMessage(
             id: UUID(),
-            userId: UUID(),
-            sender: .user,
+            role: "user",
             content: text,
-            contentType: .text,
-            actionType: nil,
-            actionPayload: nil,
-            urgency: nil,
-            surface: nil,
-            readAt: nil,
+            messageType: nil,
+            sourceSkill: nil,
             createdAt: Date()
         )
         messages.append(optimistic)
 
         do {
-            let response: ThreadMessage = try await APIService.shared.request(
+            let result: ThreadSendResponse = try await APIService.shared.request(
                 "/thread",
                 method: "POST",
-                body: ["message": text]
+                body: ["content": text]
             )
-            messages.append(response)
+            messages.append(result.response)
         } catch { }
     }
 }

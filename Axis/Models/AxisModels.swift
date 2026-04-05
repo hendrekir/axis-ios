@@ -21,43 +21,34 @@ struct AxisUser: Codable, Identifiable {
 
 struct ThreadMessage: Codable, Identifiable {
     let id: UUID
-    let userId: UUID
-    let sender: Sender
+    let role: String
     let content: String
-    let contentType: ContentType
-    let actionType: ActionType?
-    let actionPayload: String?
-    let urgency: Int?
-    let surface: String?
-    let readAt: Date?
+    let messageType: String?
+    let sourceSkill: String?
     let createdAt: Date
 
-    enum Sender: String, Codable {
-        case user
-        case axis
+    var isFromAxis: Bool { role == "assistant" }
+
+    var isActionable: Bool {
+        messageType == "email_draft" || messageType == "action"
     }
 
-    enum ContentType: String, Codable {
-        case text
-        case brainDump = "brain_dump"
-        case digest
-        case emailDraft = "email_draft"
-        case taskUpdate = "task_update"
-        case signal
-        case action
+    var actionType: ActionType? {
+        guard isActionable else { return nil }
+        if messageType == "email_draft" { return .sendReply }
+        return nil
     }
 
     enum ActionType: String, Codable {
         case sendReply = "send_reply"
-        case createTask = "create_task"
         case markDone = "mark_done"
-        case snooze
         case dismiss
-        case none
     }
+}
 
-    var isFromAxis: Bool { sender == .axis }
-    var isActionable: Bool { actionType != nil && actionType != ThreadMessage.ActionType.none }
+struct ThreadSendResponse: Codable {
+    let userMessage: ThreadMessage
+    let response: ThreadMessage
 }
 
 // MARK: - Signal
@@ -69,7 +60,7 @@ struct Signal: Codable, Identifiable {
     let body: String?
     let urgency: Int
     let actionable: Bool
-    let actionType: ThreadMessage.ActionType?
+    let actionType: String?
     let actionPayload: String?
     let category: Category
     let source: String?
