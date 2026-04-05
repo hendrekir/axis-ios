@@ -56,7 +56,7 @@ struct ThreadView: View {
 
     private func loadMessages() async {
         do {
-            messages = try await APIService.shared.request("/thread")
+            messages = try await APIService.shared.request("/thread/history")
         } catch { }
         isLoading = false
     }

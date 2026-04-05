@@ -132,7 +132,7 @@ private struct MorningBriefCard: View {
                 }
 
                 // Sign-off
-                Text("Put the phone down.")
+                Text("Your move.")
                     .font(Font.custom("InstrumentSans-Regular", size: 14).italic())
                     .foregroundColor(.axisTextMuted)
 
@@ -169,6 +169,14 @@ private struct SignalHeroCard: View {
         }
     }
 
+    private var urgencyLabel: String {
+        switch signal.urgency {
+        case 9...10: return "Now"
+        case 7...8:  return "Today"
+        default:     return "When you can"
+        }
+    }
+
     var body: some View {
         AxisCard(elevated: true) {
             VStack(alignment: .leading, spacing: 0) {
@@ -180,7 +188,7 @@ private struct SignalHeroCard: View {
                 VStack(alignment: .leading, spacing: AxisSpacing.md) {
                     // Label row
                     HStack {
-                        AxisTag(text: "Signal", color: urgencyColor)
+                        AxisTag(text: urgencyLabel, color: urgencyColor)
                         Spacer()
                         Text(signal.createdAt, style: .relative)
                             .font(.axisMono(10))
