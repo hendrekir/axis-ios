@@ -36,7 +36,7 @@ struct SignalView: View {
 
     private func loadSignals() async {
         do {
-            signals = try await APIService.shared.request("/signals")
+            signals = try await APIService.shared.request("/signal")
             isLoading = false
         } catch {
             isLoading = false
@@ -45,14 +45,14 @@ struct SignalView: View {
 
     private func completeSignal(_ signal: Signal) async {
         do {
-            try await APIService.shared.requestVoid("/signals/\(signal.id)/complete", method: "POST")
+            try await APIService.shared.requestVoid("/signal/\(signal.id)/complete", method: "POST")
             signals.removeAll { $0.id == signal.id }
         } catch { }
     }
 
     private func snoozeSignal(_ signal: Signal) async {
         do {
-            try await APIService.shared.requestVoid("/signals/\(signal.id)/snooze", method: "POST")
+            try await APIService.shared.requestVoid("/signal/\(signal.id)/snooze", method: "POST")
             signals.removeAll { $0.id == signal.id }
         } catch { }
     }

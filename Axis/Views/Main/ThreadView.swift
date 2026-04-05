@@ -28,6 +28,7 @@ struct ThreadView: View {
                     }
                 }
             }
+            .onTapGesture { hideKeyboard() }
             .overlay {
                 if isLoading {
                     ProgressView()
@@ -48,6 +49,8 @@ struct ThreadView: View {
                 TextField("Message Axis...", text: $inputText, axis: .vertical)
                     .lineLimit(1...5)
                     .textFieldStyle(.plain)
+                    .foregroundStyle(.primary)
+                    .tint(Color.accentColor)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 10)
                     .background(Color("AxisCard"), in: Capsule())

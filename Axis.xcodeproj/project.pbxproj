@@ -23,6 +23,7 @@
 		A10014 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20014 /* SettingsView.swift */; };
 		A10015 /* ApprenticeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20015 /* ApprenticeView.swift */; };
 		A10016 /* ClerkKit in Frameworks */ = {isa = PBXBuildFile; productRef = B10001 /* ClerkKit */; };
+		A10017 /* ViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20017 /* ViewExtensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +42,7 @@
 		A20013 /* BriefView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BriefView.swift; sourceTree = "<group>"; };
 		A20014 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		A20015 /* ApprenticeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApprenticeView.swift; sourceTree = "<group>"; };
+		A20017 /* ViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewExtensions.swift; sourceTree = "<group>"; };
 		A30001 /* Axis.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Axis.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -114,6 +116,7 @@
 		A50006 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				A20017 /* ViewExtensions.swift */,
 				A50007 /* Auth */,
 				A50008 /* Main */,
 			);
@@ -189,12 +192,12 @@
 				Base,
 			);
 			mainGroup = A50000;
-			productRefGroup = A50003 /* Products */;
-			projectDirPath = "";
-			projectRoot = "";
 			packageReferences = (
 				B00001 /* XCRemoteSwiftPackageReference "clerk-ios" */,
 			);
+			productRefGroup = A50003 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
 			targets = (
 				A60001 /* Axis */,
 			);
@@ -231,6 +234,7 @@
 				A10013 /* BriefView.swift in Sources */,
 				A10014 /* SettingsView.swift in Sources */,
 				A10015 /* ApprenticeView.swift in Sources */,
+				A10017 /* ViewExtensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -458,7 +462,6 @@
 			productName = ClerkKit;
 		};
 /* End XCSwiftPackageProductDependency section */
-
 	};
 	rootObject = A00001 /* Project object */;
 }

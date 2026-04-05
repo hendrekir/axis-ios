@@ -5,13 +5,22 @@ struct BriefView: View {
     @State private var isLoading = true
     @State private var loadFailed = false
 
+    private var greeting: String {
+        let hour = Calendar.current.component(.hour, from: Date())
+        switch hour {
+        case 5..<12: return "Good morning"
+        case 12..<17: return "Good afternoon"
+        default: return "Good evening"
+        }
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 if let brief {
                     // Header
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Good morning")
+                        Text(greeting)
                             .font(.title2.bold())
                         Text(brief.generatedAt, style: .date)
                             .font(.caption)

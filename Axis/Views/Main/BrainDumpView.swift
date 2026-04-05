@@ -24,6 +24,8 @@ struct BrainDumpView: View {
                     // Text input
                     TextEditor(text: $text)
                         .focused($isFocused)
+                        .foregroundStyle(.primary)
+                        .tint(Color.accentColor)
                         .frame(minHeight: 200)
                         .scrollContentBackground(.hidden)
                         .padding(16)
@@ -64,6 +66,7 @@ struct BrainDumpView: View {
                 }
                 .padding(.vertical)
             }
+            .onTapGesture { hideKeyboard() }
 
             if isProcessing {
                 HStack(spacing: 8) {
@@ -92,6 +95,7 @@ struct BrainDumpView: View {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
         isProcessing = true
+        isFocused = false
 
         Task {
             do {

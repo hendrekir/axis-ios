@@ -58,6 +58,8 @@ final class APIService {
             throw APIError.invalidResponse
         }
 
+        print("[API] \(method) \(endpoint) → \(http.statusCode)")
+
         guard (200...299).contains(http.statusCode) else {
             throw APIError.httpError(statusCode: http.statusCode, data: data)
         }
@@ -77,6 +79,8 @@ final class APIService {
         guard let http = response as? HTTPURLResponse else {
             throw APIError.invalidResponse
         }
+
+        print("[API] \(method) \(endpoint) → \(http.statusCode)")
 
         guard (200...299).contains(http.statusCode) else {
             throw APIError.httpError(statusCode: http.statusCode, data: data)
