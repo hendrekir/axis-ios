@@ -24,6 +24,15 @@
 		A10015 /* ApprenticeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20015 /* ApprenticeView.swift */; };
 		A10016 /* ClerkKit in Frameworks */ = {isa = PBXBuildFile; productRef = B10001 /* ClerkKit */; };
 		A10017 /* ViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20017 /* ViewExtensions.swift */; };
+		A10018 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20018 /* Colors.swift */; };
+		A10019 /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20019 /* Typography.swift */; };
+		A10020 /* Spacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20020 /* Spacing.swift */; };
+		A10021 /* AxisCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20021 /* AxisCard.swift */; };
+		A10022 /* AxisTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20022 /* AxisTag.swift */; };
+		A10023 /* AxisButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20023 /* AxisButton.swift */; };
+		A10024 /* AxisTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20024 /* AxisTextField.swift */; };
+		A10025 /* AxisMark.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20025 /* AxisMark.swift */; };
+		A10026 /* AxisDivider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20026 /* AxisDivider.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,6 +52,15 @@
 		A20014 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		A20015 /* ApprenticeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApprenticeView.swift; sourceTree = "<group>"; };
 		A20017 /* ViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewExtensions.swift; sourceTree = "<group>"; };
+		A20018 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
+		A20019 /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
+		A20020 /* Spacing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spacing.swift; sourceTree = "<group>"; };
+		A20021 /* AxisCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AxisCard.swift; sourceTree = "<group>"; };
+		A20022 /* AxisTag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AxisTag.swift; sourceTree = "<group>"; };
+		A20023 /* AxisButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AxisButton.swift; sourceTree = "<group>"; };
+		A20024 /* AxisTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AxisTextField.swift; sourceTree = "<group>"; };
+		A20025 /* AxisMark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AxisMark.swift; sourceTree = "<group>"; };
+		A20026 /* AxisDivider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AxisDivider.swift; sourceTree = "<group>"; };
 		A30001 /* Axis.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Axis.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -71,6 +89,7 @@
 			children = (
 				A20001 /* AxisApp.swift */,
 				A20002 /* ContentView.swift */,
+				A50009 /* DesignSystem */,
 				A50005 /* Models */,
 				A50002 /* Services */,
 				A50006 /* Views */,
@@ -143,6 +162,30 @@
 				A20015 /* ApprenticeView.swift */,
 			);
 			path = Main;
+			sourceTree = "<group>";
+		};
+		A50009 /* DesignSystem */ = {
+			isa = PBXGroup;
+			children = (
+				A20018 /* Colors.swift */,
+				A20019 /* Typography.swift */,
+				A20020 /* Spacing.swift */,
+				A50010 /* Components */,
+			);
+			path = DesignSystem;
+			sourceTree = "<group>";
+		};
+		A50010 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				A20021 /* AxisCard.swift */,
+				A20022 /* AxisTag.swift */,
+				A20023 /* AxisButton.swift */,
+				A20024 /* AxisTextField.swift */,
+				A20025 /* AxisMark.swift */,
+				A20026 /* AxisDivider.swift */,
+			);
+			path = Components;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -235,6 +278,15 @@
 				A10014 /* SettingsView.swift in Sources */,
 				A10015 /* ApprenticeView.swift in Sources */,
 				A10017 /* ViewExtensions.swift in Sources */,
+				A10018 /* Colors.swift in Sources */,
+				A10019 /* Typography.swift in Sources */,
+				A10020 /* Spacing.swift in Sources */,
+				A10021 /* AxisCard.swift in Sources */,
+				A10022 /* AxisTag.swift in Sources */,
+				A10023 /* AxisButton.swift in Sources */,
+				A10024 /* AxisTextField.swift in Sources */,
+				A10025 /* AxisMark.swift in Sources */,
+				A10026 /* AxisDivider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
