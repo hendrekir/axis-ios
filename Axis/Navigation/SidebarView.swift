@@ -1,4 +1,5 @@
 import SwiftUI
+import ClerkKit
 
 struct SidebarView: View {
     @Binding var isVisible: Bool
@@ -273,52 +274,83 @@ private struct SidebarScheduleView: View {
 private struct SidebarConnectionsView: View {
     @State private var connections: [Connection] = []
     @State private var isLoading = true
+    @State private var clerkId: String = ""
 
-    private let availableConnections: [(icon: String, name: String, color: Color)] = [
-        ("envelope.fill", "Gmail", .axisRed),
-        ("calendar", "Google Calendar", .axisAmber),
-        ("music.note", "Spotify", .axisGreen),
-        ("dollarsign.circle.fill", "Stripe", .axisViolet),
+    private static let baseURL = "https://web-production-32f5d.up.railway.app"
+
+    private struct ServiceInfo: Identifiable {
+        let id = UUID()
+        let icon: String
+        let name: String
+        let color: Color
+        let oauthPath: String?  // nil = no OAuth yet
+    }
+
+    private let services: [ServiceInfo] = [
+        ServiceInfo(icon: "envelope.fill", name: "Gmail", color: .axisRed, oauthPath: "/auth/gmail"),
+        ServiceInfo(icon: "calendar", name: "Google Calendar", color: .axisAmber, oauthPath: "/auth/calendar"),
+        ServiceInfo(icon: "music.note", name: "Spotify", color: .axisGreen, oauthPath: "/auth/spotify"),
+        ServiceInfo(icon: "dollarsign.circle.fill", name: "Stripe", color: .axisViolet, oauthPath: nil),
     ]
+
+    private func isConnected(_ name: String) -> Bool {
+        connections.contains { $0.provider.lowercased() == name.lowercased() && $0.isConnected }
+    }
+
+    private func connectService(_ service: ServiceInfo) {
+        guard let path = service.oauthPath,
+              let url = URL(string: "\(Self.baseURL)\(path)?clerk_id=\(clerkId)") else { return }
+        UIApplication.shared.open(url)
+    }
 
     var body: some View {
         ScrollView {
             VStack(spacing: AxisSpacing.sm) {
-                ForEach(availableConnections, id: \.name) { item in
-                    let connected = connections.first { $0.provider.lowercased() == item.name.lowercased() }?.isConnected ?? false
+                ForEach(services) { service in
+                    let connected = isConnected(service.name)
 
-                    HStack(spacing: 14) {
-                        Image(systemName: item.icon)
-                            .font(.system(size: 16))
-                            .foregroundColor(connected ? item.color : .axisTextMuted)
-                            .frame(width: 36, height: 36)
-                            .background(connected ? item.color.opacity(0.12) : Color.axisSurface2)
-                            .cornerRadius(AxisRadius.sm)
-
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(item.name)
-                                .font(.axisH2)
-                                .foregroundColor(.axisTextPrimary)
-                            Text(connected ? "Connected" : "Not connected")
-                                .font(.axisMono(10))
-                                .foregroundColor(connected ? .axisGreen : .axisTextMuted)
-                        }
-
-                        Spacer()
-
-                        if connected {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.axisGreen)
+                    Button {
+                        if !connected { connectService(service) }
+                    } label: {
+                        HStack(spacing: 14) {
+                            Image(systemName: service.icon)
                                 .font(.system(size: 16))
-                        } else {
-                            Text("Connect")
-                                .font(.axisBody(13, weight: .medium))
-                                .foregroundColor(.axisViolet)
+                                .foregroundColor(connected ? service.color : .axisTextMuted)
+                                .frame(width: 36, height: 36)
+                                .background(connected ? service.color.opacity(0.12) : Color.axisSurface2)
+                                .cornerRadius(AxisRadius.sm)
+
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(service.name)
+                                    .font(.axisH2)
+                                    .foregroundColor(.axisTextPrimary)
+                                Text(connected ? "Connected" : "Not connected")
+                                    .font(.axisMono(10))
+                                    .foregroundColor(connected ? .axisGreen : .axisTextMuted)
+                            }
+
+                            Spacer()
+
+                            if connected {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundColor(.axisGreen)
+                                    .font(.system(size: 16))
+                            } else if service.oauthPath != nil {
+                                Text("Connect")
+                                    .font(.axisBody(13, weight: .medium))
+                                    .foregroundColor(.axisViolet)
+                            } else {
+                                Text("Coming soon")
+                                    .font(.axisMono(10))
+                                    .foregroundColor(.axisTextMuted)
+                            }
                         }
+                        .padding(14)
+                        .background(Color.axisSurface1)
+                        .cornerRadius(AxisRadius.md)
                     }
-                    .padding(14)
-                    .background(Color.axisSurface1)
-                    .cornerRadius(AxisRadius.md)
+                    .buttonStyle(.plain)
+                    .disabled(connected || service.oauthPath == nil)
                 }
             }
             .padding(.horizontal, AxisSpacing.base)
@@ -327,6 +359,16 @@ private struct SidebarConnectionsView: View {
         .navigationTitle("Connections")
         .navigationBarTitleDisplayMode(.inline)
         .task {
+            // Load clerk ID for OAuth URLs
+            #if targetEnvironment(simulator)
+            clerkId = "dev_simulator"
+            #else
+            if let token = try? await Clerk.shared.auth.getToken() {
+                // Extract clerk user ID from session
+                clerkId = Clerk.shared.user?.id ?? ""
+            }
+            #endif
+
             do {
                 connections = try await APIService.shared.request("/connections")
             } catch { }
