@@ -362,6 +362,7 @@ private struct CapturePromptCard: View {
     let onCapture: (String) async -> Void
     @State private var text = ""
     @State private var isSaving = false
+    @FocusState private var isFocused: Bool
 
     var canSubmit: Bool {
         !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isSaving
@@ -379,6 +380,7 @@ private struct CapturePromptCard: View {
                     text: $text,
                     multiline: true
                 )
+                .focused($isFocused)
                 .frame(minHeight: 80)
 
                 if canSubmit {
@@ -411,6 +413,7 @@ private struct CapturePromptCard: View {
                 }
             }
             .padding(14)
+            .onAppear { isFocused = true }
         }
         .animation(.easeInOut(duration: 0.15), value: canSubmit)
     }
