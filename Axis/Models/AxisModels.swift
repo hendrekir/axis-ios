@@ -179,6 +179,16 @@ struct InteractionLog: Encodable {
     let mode: String?
 }
 
+// MARK: - Recommendation
+
+struct Recommendation: Codable {
+    let type: String
+    let title: String
+    let reason: String
+    let url: String
+    let source: String
+}
+
 // MARK: - Capture
 
 struct Capture: Codable, Identifiable {

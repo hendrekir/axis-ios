@@ -35,6 +35,7 @@ private struct BriefTodayView: View {
     @State private var isLoading = true
     @State private var loadFailed = false
     @State private var isPlaying = false
+    @State private var recommendation: Recommendation?
 
     var body: some View {
         ScrollView {
@@ -128,6 +129,12 @@ private struct BriefTodayView: View {
                         }
                     }
 
+                    // Discovery recommendation
+                    if let rec = recommendation {
+                        DiscoveryCard(recommendation: rec)
+                            .padding(.horizontal, AxisSpacing.base)
+                    }
+
                     // Sign-off
                     Text("Your move.")
                         .font(Font.custom("InstrumentSans-Regular", size: 14).italic())
@@ -177,6 +184,7 @@ private struct BriefTodayView: View {
         } catch {
             loadFailed = true
         }
+        recommendation = try? await APIService.shared.request("/me/recommendation")
         isLoading = false
     }
 }
@@ -342,6 +350,54 @@ private struct Lesson {
     let title: String
     let content: String
     let source: String
+}
+
+// MARK: - Discovery Card
+
+private struct DiscoveryCard: View {
+    let recommendation: Recommendation
+
+    private var icon: String {
+        switch recommendation.type {
+        case "podcast": return "headphones"
+        case "article": return "doc.text"
+        case "book":    return "book"
+        case "product": return "bag"
+        default:        return "sparkles"
+        }
+    }
+
+    var body: some View {
+        AxisCard {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    AxisTag(text: "For you today", color: .axisViolet)
+                    Spacer()
+                    Image(systemName: icon)
+                        .font(.system(size: 14))
+                        .foregroundColor(.axisViolet)
+                }
+                Text(recommendation.title)
+                    .font(.axisH1)
+                    .foregroundColor(.axisTextPrimary)
+                    .lineSpacing(2)
+                Text(recommendation.reason)
+                    .font(.axisBody2)
+                    .foregroundColor(.axisTextSecondary)
+                    .lineSpacing(3)
+                if let url = URL(string: recommendation.url) {
+                    Link(recommendation.source, destination: url)
+                        .font(.axisMono(10))
+                        .foregroundColor(.axisViolet)
+                } else {
+                    Text(recommendation.source)
+                        .font(.axisMono(10))
+                        .foregroundColor(.axisTextMuted)
+                }
+            }
+            .padding(14)
+        }
+    }
 }
 
 #Preview {
