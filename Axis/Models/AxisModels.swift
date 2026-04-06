@@ -181,6 +181,16 @@ struct InteractionLog: Encodable {
 
 // MARK: - Capture
 
+struct Capture: Codable, Identifiable {
+    let id: UUID
+    let content: String
+    let captureType: String?
+    let person: String?
+    let urgency: Int?
+    let suggestedTime: String?
+    let createdAt: Date
+}
+
 struct CaptureRequest: Encodable {
     let content: String
 }

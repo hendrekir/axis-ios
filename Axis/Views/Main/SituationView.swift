@@ -3,12 +3,10 @@ import SwiftUI
 struct SituationView: View {
     @State private var brief: Brief?
     @State private var signals: [Signal] = []
+    @State private var captures: [Capture] = []
     @State private var isLoading = true
     @State private var loadFailed = false
-    @State private var showContextSetup = false
-    @State private var contextText = ""
-    @State private var isSavingContext = false
-    @State private var contextSaved = false
+    @State private var showCapturedBanner = false
 
     private var currentGreeting: String {
         let hour = Calendar.current.component(.hour, from: Date())
@@ -31,31 +29,57 @@ struct SituationView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: AxisSpacing.base) {
-                // MORNING BRIEF
-                if let brief {
-                    MorningBriefCard(brief: brief)
-                }
+        ZStack(alignment: .top) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: AxisSpacing.base) {
+                    // MORNING BRIEF
+                    if let brief {
+                        MorningBriefCard(brief: brief)
+                    }
 
-                // SIGNAL HERO
-                if let signal = topSignal {
-                    SignalHeroCard(signal: signal, onComplete: {
-                        await completeSignal(signal)
-                    }, onSnooze: {
-                        await snoozeSignal(signal)
-                    })
-                }
+                    // SIGNAL HERO
+                    if let signal = topSignal {
+                        SignalHeroCard(signal: signal, onComplete: {
+                            await completeSignal(signal)
+                        }, onSnooze: {
+                            await snoozeSignal(signal)
+                        })
+                    }
 
-                // AXIS HANDLED
-                if let brief, brief.silentCount > 0 {
-                    AxisHandledCard(silentCount: brief.silentCount)
+                    // CAPTURE PROMPT (replaces empty state)
+                    if brief == nil && signals.isEmpty && !isLoading {
+                        CapturePromptCard(onCapture: { text in
+                            await submitCapture(text)
+                        })
+                    }
+
+                    // AXIS HANDLED
+                    if let brief, brief.silentCount > 0 {
+                        AxisHandledCard(silentCount: brief.silentCount)
+                    }
                 }
+                .padding(.horizontal, AxisSpacing.base)
+                .padding(.top, AxisSpacing.sm)
             }
-            .padding(.horizontal, AxisSpacing.base)
-            .padding(.top, AxisSpacing.sm)
+            .background(Color.axisBackground)
+
+            // "Axis caught that" banner
+            if showCapturedBanner {
+                HStack(spacing: 8) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 14))
+                    Text("Axis caught that.")
+                        .font(.axisBody(14, weight: .medium))
+                }
+                .foregroundColor(.white)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
+                .background(Color.axisGreen)
+                .cornerRadius(AxisRadius.pill)
+                .padding(.top, 8)
+                .transition(.move(edge: .top).combined(with: .opacity))
+            }
         }
-        .background(Color.axisBackground)
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -74,17 +98,6 @@ struct SituationView: View {
             if isLoading {
                 SituationLoadingView()
             }
-            if !isLoading && brief == nil && signals.isEmpty && !showContextSetup {
-                SituationEmptyView(loadFailed: loadFailed)
-            }
-        }
-        .sheet(isPresented: $showContextSetup) {
-            ContextSetupSheet(
-                contextText: $contextText,
-                isSaving: $isSavingContext,
-                saved: $contextSaved,
-                onSave: { await saveContext() }
-            )
         }
         .task { await loadData() }
         .refreshable { await loadData() }
@@ -97,37 +110,34 @@ struct SituationView: View {
         async let signalsResult: [Signal] = {
             (try? await APIService.shared.request("/signal")) ?? []
         }()
+        async let capturesResult: [Capture] = {
+            (try? await APIService.shared.request("/capture")) ?? []
+        }()
 
         brief = await briefResult
         signals = await signalsResult
+        captures = await capturesResult
         isLoading = false
-
-        // Simulator: if no data after load, prompt context setup after 3s
-        #if targetEnvironment(simulator)
-        if brief == nil && signals.isEmpty && !contextSaved {
-            try? await Task.sleep(for: .seconds(3))
-            if brief == nil && signals.isEmpty {
-                showContextSetup = true
-            }
-        }
-        #endif
     }
 
-    private func saveContext() async {
-        isSavingContext = true
+    private func submitCapture(_ text: String) async {
         do {
-            let payload = ContextSetupPayload(
-                contextNotes: contextText,
-                timezone: TimeZone.current.identifier
+            try await APIService.shared.requestVoid(
+                "/capture",
+                method: "POST",
+                body: CaptureRequest(content: text)
             )
-            try await APIService.shared.requestVoid("/me", method: "PATCH", body: payload)
-            contextSaved = true
-            showContextSetup = false
-            // Reload to pick up any new signals generated from context
-            isLoading = true
+            // Show banner
+            withAnimation(.easeInOut(duration: 0.3)) {
+                showCapturedBanner = true
+            }
+            // Hide after 2 seconds, then reload
+            try? await Task.sleep(for: .seconds(2))
+            withAnimation(.easeInOut(duration: 0.3)) {
+                showCapturedBanner = false
+            }
             await loadData()
         } catch { }
-        isSavingContext = false
     }
 
     private func completeSignal(_ signal: Signal) async {
@@ -346,102 +356,62 @@ private struct SituationLoadingView: View {
     }
 }
 
-private struct SituationEmptyView: View {
-    let loadFailed: Bool
+// MARK: - Capture Prompt Card (replaces empty state)
 
-    var body: some View {
-        ContentUnavailableView(
-            loadFailed ? "Couldn't load" : "All clear",
-            systemImage: loadFailed ? "exclamationmark.triangle" : "checkmark.seal",
-            description: Text(loadFailed
-                ? "Pull down to try again."
-                : "No signals right now. Axis is watching.")
-        )
+private struct CapturePromptCard: View {
+    let onCapture: (String) async -> Void
+    @State private var text = ""
+    @State private var isSaving = false
+
+    var canSubmit: Bool {
+        !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isSaving
     }
-}
-
-// MARK: - Context Setup Sheet (Simulator onboarding)
-
-private struct ContextSetupSheet: View {
-    @Binding var contextText: String
-    @Binding var isSaving: Bool
-    @Binding var saved: Bool
-    let onSave: () async -> Void
 
     var body: some View {
-        NavigationStack {
-            VStack(alignment: .leading, spacing: AxisSpacing.base) {
-                VStack(alignment: .leading, spacing: AxisSpacing.sm) {
-                    Text("Set up context")
-                        .font(.axisSyne(22))
-                        .foregroundColor(.axisTextPrimary)
-                    Text("Tell Axis about your work, projects, goals, and the people that matter. This seeds the dispatch job with real data.")
-                        .font(.axisBody2)
-                        .foregroundColor(.axisTextSecondary)
-                        .lineSpacing(3)
-                }
-
-                TextEditor(text: $contextText)
-                    .font(.axisBody1)
+        AxisCard(elevated: true, accent: true) {
+            VStack(alignment: .leading, spacing: AxisSpacing.md) {
+                Text("What's on your mind?")
+                    .font(.axisH2)
                     .foregroundColor(.axisTextPrimary)
-                    .scrollContentBackground(.hidden)
-                    .padding(12)
-                    .frame(minHeight: 160)
-                    .background(Color.axisSurface2)
-                    .cornerRadius(AxisRadius.md)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: AxisRadius.md)
-                            .stroke(Color.axisBorderInput, lineWidth: 0.5)
-                    )
-                    .overlay(alignment: .topLeading) {
-                        if contextText.isEmpty {
-                            Text("Your work, projects, goals, the people that matter...")
-                                .font(.axisBody1)
-                                .foregroundColor(.axisTextMuted)
-                                .padding(16)
-                                .allowsHitTesting(false)
-                        }
-                    }
 
-                Button {
-                    Task { await onSave() }
-                } label: {
-                    HStack {
-                        if isSaving {
-                            ProgressView()
-                                .tint(.white)
-                                .scaleEffect(0.8)
-                        }
-                        Text(isSaving ? "Saving..." : "Save context")
-                    }
-                    .font(.axisBody(15, weight: .medium))
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-                    .background(contextText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                        ? Color.axisViolet.opacity(0.4)
-                        : Color.axisViolet)
-                    .cornerRadius(AxisRadius.md)
-                }
-                .buttonStyle(.plain)
-                .disabled(contextText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSaving)
+                AxisTextField(
+                    placeholder: "Anything you've been meaning to do...",
+                    text: $text,
+                    multiline: true
+                )
+                .frame(minHeight: 80)
 
-                Spacer()
-            }
-            .padding(AxisSpacing.base)
-            .background(Color.axisBackground)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Skip") {
-                        saved = true
+                if canSubmit {
+                    Button {
+                        isSaving = true
+                        let content = text.trimmingCharacters(in: .whitespacesAndNewlines)
+                        text = ""
+                        Task {
+                            await onCapture(content)
+                            isSaving = false
+                        }
+                    } label: {
+                        HStack(spacing: 6) {
+                            if isSaving {
+                                ProgressView()
+                                    .tint(.white)
+                                    .scaleEffect(0.7)
+                            }
+                            Text(isSaving ? "Saving..." : "Tell Axis")
+                        }
+                        .font(.axisBody(14, weight: .medium))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 10)
+                        .background(Color.axisViolet)
+                        .cornerRadius(AxisRadius.pill)
                     }
-                    .font(.axisBody2)
-                    .foregroundColor(.axisTextSecondary)
+                    .buttonStyle(.plain)
+                    .transition(.scale.combined(with: .opacity))
                 }
             }
+            .padding(14)
         }
-        .presentationDetents([.medium, .large])
-        .presentationDragIndicator(.visible)
+        .animation(.easeInOut(duration: 0.15), value: canSubmit)
     }
 }
