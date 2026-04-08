@@ -22,24 +22,22 @@ final class APIService {
 
     // MARK: - Auth header
 
-    /// Gets the current auth token. On device: fresh Clerk token. On simulator: dev token from Keychain.
-    private func getAuthToken() async -> String? {
-        #if targetEnvironment(simulator)
-        return KeychainService.shared.get(.clerkJWT)
-        #else
-        // Get a fresh token from Clerk (auto-refreshes if near expiry)
-        return try? await Clerk.shared.auth.getToken()
-        #endif
-    }
-
     private func authorizedRequest(for endpoint: String, method: String = "GET") async -> URLRequest {
         let url = baseURL.appendingPathComponent(endpoint)
         var request = URLRequest(url: url)
         request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        if let token = await getAuthToken() {
+
+        #if targetEnvironment(simulator)
+        // Simulator: no JWT, use dev bypass header instead
+        request.setValue("true", forHTTPHeaderField: "X-Dev-Simulator")
+        #else
+        // Device: attach real Clerk JWT
+        if let token = try? await Clerk.shared.auth.getToken() {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
+        #endif
+
         return request
     }
 
@@ -85,6 +83,37 @@ final class APIService {
         guard (200...299).contains(http.statusCode) else {
             throw APIError.httpError(statusCode: http.statusCode, data: data)
         }
+    }
+
+    // MARK: - Notification action endpoints
+
+    private struct DeviceTokenBody: Encodable {
+        let token: String
+        let platform: String = "ios"
+    }
+
+    private struct SnoozeBody: Encodable {
+        let hours: Int
+    }
+
+    func registerDeviceToken(_ token: String) async throws {
+        try await requestVoid("/me/device-token", method: "POST", body: DeviceTokenBody(token: token))
+    }
+
+    func completeTopSignal() async throws {
+        try await requestVoid("/signal/top/complete", method: "POST")
+    }
+
+    func snoozeTopSignal(hours: Int) async throws {
+        try await requestVoid("/signal/top/snooze", method: "POST", body: SnoozeBody(hours: hours))
+    }
+
+    func dismissTopSignal() async throws {
+        try await requestVoid("/signal/top/dismiss", method: "POST")
+    }
+
+    func sendPendingDraft() async throws {
+        try await requestVoid("/gmail/send", method: "POST")
     }
 }
 

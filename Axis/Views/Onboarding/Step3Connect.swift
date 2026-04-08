@@ -56,6 +56,7 @@ struct Step3Confirmation: View {
                 }
 
                 AxisPrimaryButton(title: "Continue") {
+                    NotificationService.shared.requestPermission()
                     onContinue()
                 }
             }
