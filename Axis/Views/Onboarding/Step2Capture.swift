@@ -101,7 +101,11 @@ struct Step2FridgeNote: View {
             .frame(maxWidth: .infinity)
             .padding(.bottom, AxisSpacing.xl)
         }
-        .onAppear { isFocused = true }
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                isFocused = true
+            }
+        }
     }
 
     private func save() {

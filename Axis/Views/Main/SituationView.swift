@@ -413,7 +413,11 @@ private struct CapturePromptCard: View {
                 }
             }
             .padding(14)
-            .onAppear { isFocused = true }
+            .onAppear {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                    isFocused = true
+                }
+            }
         }
         .animation(.easeInOut(duration: 0.15), value: canSubmit)
     }
