@@ -101,10 +101,9 @@ struct Step2FridgeNote: View {
             .frame(maxWidth: .infinity)
             .padding(.bottom, AxisSpacing.xl)
         }
-        .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-                isFocused = true
-            }
+        .task {
+            try? await Task.sleep(for: .milliseconds(400))
+            isFocused = true
         }
     }
 
