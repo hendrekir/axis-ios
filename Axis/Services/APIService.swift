@@ -35,13 +35,15 @@ final class APIService {
         // Simulator: no JWT, use dev bypass header instead
         request.setValue("true", forHTTPHeaderField: "X-Dev-Simulator")
         #else
-        // Device: attach real Clerk JWT, or fall back to dev login token
-        if let token = try? await Clerk.shared.auth.getToken() {
-            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-            AppGroupBridge.setToken(token)
-        } else if let devToken = KeychainService.shared.get(.clerkJWT) {
+        // Device: prefer dev login token if present (avoids Clerk getToken
+        // returning empty/invalid when no Clerk session exists).
+        // Fall back to live Clerk JWT for real sign-in sessions.
+        if let devToken = KeychainService.shared.get(.clerkJWT), !devToken.isEmpty {
             request.setValue("Bearer \(devToken)", forHTTPHeaderField: "Authorization")
             AppGroupBridge.setToken(devToken)
+        } else if let token = try? await Clerk.shared.auth.getToken(), let token, !token.isEmpty {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+            AppGroupBridge.setToken(token)
         }
         #endif
 

@@ -293,6 +293,21 @@ private struct SidebarConnectionsView: View {
         ServiceInfo(icon: "dollarsign.circle.fill", name: "Stripe", color: .axisViolet, oauthPath: nil),
     ]
 
+    /// Decode the `sub` claim from a JWT without signature verification.
+    private static func extractSub(from jwt: String) -> String? {
+        let parts = jwt.split(separator: ".")
+        guard parts.count >= 2 else { return nil }
+        var payload = String(parts[1])
+        // Base64URL → Base64
+        payload = payload.replacingOccurrences(of: "-", with: "+")
+                         .replacingOccurrences(of: "_", with: "/")
+        while payload.count % 4 != 0 { payload += "=" }
+        guard let data = Data(base64Encoded: payload),
+              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let sub = json["sub"] as? String else { return nil }
+        return sub
+    }
+
     private func isConnected(_ name: String) -> Bool {
         connections.contains { $0.provider.lowercased() == name.lowercased() && $0.isConnected }
     }
@@ -363,9 +378,11 @@ private struct SidebarConnectionsView: View {
             #if targetEnvironment(simulator)
             clerkId = "dev_simulator"
             #else
-            if let token = try? await Clerk.shared.auth.getToken() {
-                // Extract clerk user ID from session
-                clerkId = Clerk.shared.user?.id ?? ""
+            // Try Clerk session first, then dev token
+            if let user = Clerk.shared.user {
+                clerkId = user.id
+            } else if let devToken = KeychainService.shared.get(.clerkJWT) {
+                clerkId = Self.extractSub(from: devToken) ?? ""
             }
             #endif
 
