@@ -18,6 +18,9 @@ final class APIService {
         decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         decoder.dateDecodingStrategy = .iso8601
+
+        // Share API base URL with widget extension.
+        AppGroupBridge.setBaseURL(baseURL.absoluteString)
     }
 
     // MARK: - Auth header
@@ -35,6 +38,7 @@ final class APIService {
         // Device: attach real Clerk JWT
         if let token = try? await Clerk.shared.auth.getToken() {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+            AppGroupBridge.setToken(token)
         }
         #endif
 
