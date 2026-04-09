@@ -9,6 +9,8 @@ enum AxisSpacing {
     static let xl:  CGFloat = 24
     static let xxl: CGFloat = 32
     static let section: CGFloat = 48  // Between major sections
+    static let outer: CGFloat = 24    // Standard outer screen padding
+    static let inner: CGFloat = 16    // Standard inner card padding
 }
 
 enum AxisRadius {

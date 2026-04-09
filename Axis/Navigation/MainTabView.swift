@@ -1,88 +1,68 @@
 import SwiftUI
+import UIKit
 
 struct MainTabView: View {
     var onSignedOut: () -> Void
     @State private var selectedTab: Int = 0
-    @State private var sidebarVisible: Bool = false
+    @State private var sidebarPresented: Bool = false
 
-    var body: some View {
-        ZStack(alignment: .leading) {
-            TabView(selection: $selectedTab) {
-                NavigationStack {
-                    SituationView()
-                        .toolbar {
-                            ToolbarItem(placement: .navigationBarLeading) {
-                                Button(action: { sidebarVisible.toggle() }) {
-                                    Image(systemName: "line.3.horizontal")
-                                        .foregroundColor(.axisTextSecondary)
-                                }
-                            }
-                        }
-                }
-                .tabItem {
-                    Label("Situation", systemImage: "eye.fill")
-                }
-                .tag(0)
+    init(onSignedOut: @escaping () -> Void) {
+        self.onSignedOut = onSignedOut
+        // Tab bar chrome
+        let appearance = UITabBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = UIColor(Color.axisSurface1)
+        appearance.shadowColor = UIColor.white.withAlphaComponent(0.06)
+        UITabBar.appearance().standardAppearance = appearance
+        UITabBar.appearance().scrollEdgeAppearance = appearance
+    }
 
-                NavigationStack {
-                    ThreadView()
-                        .toolbar {
-                            ToolbarItem(placement: .navigationBarLeading) {
-                                Button(action: { sidebarVisible.toggle() }) {
-                                    Image(systemName: "line.3.horizontal")
-                                        .foregroundColor(.axisTextSecondary)
-                                }
-                            }
-                        }
-                }
-                .tabItem {
-                    Label("Axis", systemImage: "bubble.left.fill")
-                }
-                .tag(1)
-
-                NavigationStack {
-                    MindView()
-                        .toolbar {
-                            ToolbarItem(placement: .navigationBarLeading) {
-                                Button(action: { sidebarVisible.toggle() }) {
-                                    Image(systemName: "line.3.horizontal")
-                                        .foregroundColor(.axisTextSecondary)
-                                }
-                            }
-                        }
-                }
-                .tabItem {
-                    Label("Mind", systemImage: "brain.head.profile")
-                }
-                .tag(2)
-
-                NavigationStack {
-                    BriefView()
-                        .toolbar {
-                            ToolbarItem(placement: .navigationBarLeading) {
-                                Button(action: { sidebarVisible.toggle() }) {
-                                    Image(systemName: "line.3.horizontal")
-                                        .foregroundColor(.axisTextSecondary)
-                                }
-                            }
-                        }
-                }
-                .tabItem {
-                    Label("Brief", systemImage: "newspaper.fill")
-                }
-                .tag(3)
-            }
-            .tint(.axisViolet)
-            .toolbarBackground(.visible, for: .tabBar)
-            .toolbarBackground(Color.axisSurface1, for: .tabBar)
-
-            if sidebarVisible {
-                SidebarView(isVisible: $sidebarVisible, onSignedOut: onSignedOut)
-                    .transition(.move(edge: .leading))
-                    .zIndex(1)
+    private func sidebarToolbar() -> some ToolbarContent {
+        ToolbarItem(placement: .navigationBarLeading) {
+            Button {
+                sidebarPresented = true
+            } label: {
+                Image(systemName: "person.crop.circle")
+                    .foregroundColor(.axisTextSecondary)
             }
         }
-        .animation(.easeInOut(duration: 0.25), value: sidebarVisible)
+    }
+
+    var body: some View {
+        TabView(selection: $selectedTab) {
+            NavigationStack {
+                SituationView(selectedTab: $selectedTab)
+                    .toolbar { sidebarToolbar() }
+            }
+            .tabItem { Label("Situation", systemImage: "eye.fill") }
+            .tag(0)
+
+            NavigationStack {
+                ThreadView()
+                    .toolbar { sidebarToolbar() }
+            }
+            .tabItem { Label("Axis", systemImage: "sparkles") }
+            .tag(1)
+
+            NavigationStack {
+                MindView()
+                    .toolbar { sidebarToolbar() }
+            }
+            .tabItem { Label("Mind", systemImage: "brain.head.profile") }
+            .tag(2)
+
+            NavigationStack {
+                BriefView()
+                    .toolbar { sidebarToolbar() }
+            }
+            .tabItem { Label("Brief", systemImage: "sun.max.fill") }
+            .tag(3)
+        }
+        .tint(Color.axisViolet)
+        .animation(.easeInOut(duration: 0.2), value: selectedTab)
+        .sheet(isPresented: $sidebarPresented) {
+            SidebarView(isVisible: $sidebarPresented, onSignedOut: onSignedOut)
+        }
         .preferredColorScheme(.dark)
     }
 }

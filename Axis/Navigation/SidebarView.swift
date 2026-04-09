@@ -18,16 +18,16 @@ struct SidebarView: View {
                     .background(Color.axisBorderDefault)
                     .padding(.vertical, 16)
 
-                SidebarNavItem(icon: "bell.fill", label: "Signal") {
+                SidebarNavItem(icon: "waveform", label: "Signal") {
                     activeDestination = .signal
                 }
                 SidebarNavItem(icon: "calendar", label: "Schedule") {
                     activeDestination = .schedule
                 }
-                SidebarNavItem(icon: "network", label: "Connections") {
+                SidebarNavItem(icon: "link", label: "Connections") {
                     activeDestination = .connections
                 }
-                SidebarNavItem(icon: "cpu", label: "Capabilities") {
+                SidebarNavItem(icon: "wand.and.stars", label: "Capabilities") {
                     activeDestination = .capabilities
                 }
 

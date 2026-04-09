@@ -137,7 +137,7 @@ private struct BriefTodayView: View {
 
                     // Sign-off
                     Text("Your move.")
-                        .font(Font.custom("InstrumentSans-Regular", size: 14).italic())
+                        .font(.system(size: 14, weight: .regular).italic())
                         .foregroundColor(.axisTextMuted)
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding(.top, AxisSpacing.sm)

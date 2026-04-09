@@ -1,33 +1,31 @@
 import SwiftUI
 
+// System-font based typography. Token names preserved so call sites don't break.
+// No custom fonts bundled — everything routes through SF Pro / SF Mono.
 extension Font {
-    // DISPLAY — Syne ExtraBold 800
-    // Used for: screen titles, hero numbers, score displays
+    // DISPLAY — formerly Syne ExtraBold. Now rounded bold system.
     static func axisSyne(_ size: CGFloat) -> Font {
-        Font.custom("Syne-ExtraBold", size: size, relativeTo: .title)
+        .system(size: size, weight: .bold, design: .rounded)
     }
 
-    // BODY — Instrument Sans
-    // Used for: body copy, labels, thread messages, descriptions
+    // BODY — formerly Instrument Sans. Now default system.
     static func axisBody(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {
-        let name = weight == .medium ? "InstrumentSans-Medium" : "InstrumentSans-Regular"
-        return Font.custom(name, size: size, relativeTo: .body)
+        .system(size: size, weight: weight)
     }
 
-    // MONO — JetBrains Mono
-    // Used for: timestamps, system data, version numbers, stats
+    // MONO — formerly JetBrains Mono. Now SF Mono.
     static func axisMono(_ size: CGFloat) -> Font {
-        Font.custom("JetBrainsMono-Medium", size: size, relativeTo: .caption)
+        .system(size: size, weight: .regular, design: .monospaced)
     }
 
-    // PREDEFINED SCALES
-    static let axisHero:   Font = axisSyne(32)       // Screen heroes
-    static let axisTitle:  Font = axisSyne(22)        // Section titles
-    static let axisH1:     Font = axisSyne(28)        // Card titles (Syne bold 28)
-    static let axisH2:     Font = axisSyne(20)        // Sub-titles (Syne semibold 20)
-    static let axisBody1:  Font = axisBody(15)        // Primary body
-    static let axisBody2:  Font = axisBody(13)        // Secondary body
-    static let axisCaption:Font = axisBody(12)        // Captions, labels
-    static let axisLabel:  Font = axisMono(11)        // System labels, timestamps
-    static let axisMicro:  Font = axisMono(9)         // Tags, badges
+    // PREDEFINED SCALES (from the 10-point fix spec)
+    static let axisHero:   Font = .system(size: 32, weight: .bold,     design: .rounded)
+    static let axisTitle:  Font = .system(size: 22, weight: .bold,     design: .rounded)
+    static let axisH1:     Font = .system(size: 28, weight: .bold,     design: .rounded)
+    static let axisH2:     Font = .system(size: 20, weight: .semibold, design: .rounded)
+    static let axisBody1:  Font = .system(size: 15, weight: .regular)
+    static let axisBody2:  Font = .system(size: 13, weight: .regular)
+    static let axisCaption:Font = .system(size: 12, weight: .regular)
+    static let axisLabel:  Font = .system(size: 11, weight: .regular, design: .monospaced)
+    static let axisMicro:  Font = .system(size: 9,  weight: .regular, design: .monospaced)
 }

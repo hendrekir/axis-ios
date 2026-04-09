@@ -1,12 +1,18 @@
 import SwiftUI
 
 struct SituationView: View {
+    @Binding var selectedTab: Int
     @State private var brief: Brief?
     @State private var signals: [Signal] = []
     @State private var captures: [Capture] = []
     @State private var isLoading = true
     @State private var loadFailed = false
     @State private var showCapturedBanner = false
+    @State private var captureFocusTrigger: Int = 0
+
+    init(selectedTab: Binding<Int> = .constant(0)) {
+        self._selectedTab = selectedTab
+    }
 
     private var currentGreeting: String {
         let hour = Calendar.current.component(.hour, from: Date())
@@ -31,10 +37,28 @@ struct SituationView: View {
     var body: some View {
         ZStack(alignment: .top) {
             ScrollView {
-                VStack(alignment: .leading, spacing: AxisSpacing.base) {
+                VStack(alignment: .leading, spacing: AxisSpacing.lg) {
+                    // Greeting header
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(currentGreeting)
+                            .font(.axisH1)
+                            .foregroundColor(.axisTextPrimary)
+                        Text(currentTime)
+                            .font(.axisMono(11))
+                            .foregroundColor(.axisTextMuted)
+                    }
+                    .padding(.top, AxisSpacing.sm)
+
+                    // Single unified capture prompt — always visible at top
+                    CapturePromptCard(focusTrigger: captureFocusTrigger, onCapture: { text in
+                        await submitCapture(text)
+                    })
+                    .transition(.opacity.combined(with: .move(edge: .bottom)))
+
                     // MORNING BRIEF
                     if let brief {
                         MorningBriefCard(brief: brief)
+                            .transition(.opacity.combined(with: .move(edge: .bottom)))
                     }
 
                     // SIGNAL HERO
@@ -44,24 +68,26 @@ struct SituationView: View {
                         }, onSnooze: {
                             await snoozeSignal(signal)
                         })
-                    }
-
-                    // CAPTURE PROMPT (replaces empty state)
-                    if brief == nil && signals.isEmpty && !isLoading {
-                        CapturePromptCard(onCapture: { text in
-                            await submitCapture(text)
-                        })
+                        .transition(.opacity.combined(with: .move(edge: .bottom)))
                     }
 
                     // AXIS HANDLED
                     if let brief, brief.silentCount > 0 {
                         AxisHandledCard(silentCount: brief.silentCount)
+                            .transition(.opacity.combined(with: .move(edge: .bottom)))
                     }
                 }
-                .padding(.horizontal, AxisSpacing.base)
+                .padding(.horizontal, AxisSpacing.xl)
                 .padding(.top, AxisSpacing.sm)
+                .animation(.easeInOut(duration: 0.25), value: brief?.id)
+                .animation(.easeInOut(duration: 0.25), value: signals.count)
             }
             .background(Color.axisBackground)
+            .onChange(of: selectedTab) { _, newValue in
+                if newValue == 0 {
+                    captureFocusTrigger &+= 1
+                }
+            }
 
             // "Axis caught that" banner
             if showCapturedBanner {
@@ -82,18 +108,6 @@ struct SituationView: View {
         }
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                VStack(alignment: .trailing, spacing: 1) {
-                    Text(currentGreeting)
-                        .font(.axisMono(10))
-                        .foregroundColor(.axisTextMuted)
-                    Text(currentTime)
-                        .font(.axisMono(11))
-                        .foregroundColor(.axisTextSecondary)
-                }
-            }
-        }
         .overlay {
             if isLoading {
                 SituationLoadingView()
@@ -182,7 +196,7 @@ private struct MorningBriefCard: View {
 
                 // Sign-off
                 Text("Your move.")
-                    .font(Font.custom("InstrumentSans-Regular", size: 14).italic())
+                    .font(.system(size: 14, weight: .regular).italic())
                     .foregroundColor(.axisTextMuted)
 
                 // Silent count
@@ -359,6 +373,7 @@ private struct SituationLoadingView: View {
 // MARK: - Capture Prompt Card (replaces empty state)
 
 private struct CapturePromptCard: View {
+    let focusTrigger: Int
     let onCapture: (String) async -> Void
     @State private var text = ""
     @State private var isSaving = false
@@ -412,11 +427,13 @@ private struct CapturePromptCard: View {
                     .transition(.scale.combined(with: .opacity))
                 }
             }
-            .padding(14)
-            .onAppear {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-                    isFocused = true
-                }
+            .padding(AxisSpacing.base)
+            .task {
+                try? await Task.sleep(for: .milliseconds(400))
+                isFocused = true
+            }
+            .onChange(of: focusTrigger) { _, _ in
+                isFocused = true
             }
         }
         .animation(.easeInOut(duration: 0.15), value: canSubmit)
