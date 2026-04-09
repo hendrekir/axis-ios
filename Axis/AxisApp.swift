@@ -2,6 +2,7 @@ import SwiftUI
 import UIKit
 import UserNotifications
 import ClerkKit
+import AppIntents
 
 @main
 struct AxisApp: App {
@@ -16,6 +17,9 @@ struct AxisApp: App {
             ContentView()
                 .onOpenURL { url in
                     AppRouter.shared.handle(url)
+                }
+                .task {
+                    AxisShortcuts.updateAppShortcutParameters()
                 }
         }
     }
