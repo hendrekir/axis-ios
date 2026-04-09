@@ -22,7 +22,7 @@ struct SignInView: View {
                     .tracking(12)
                     .foregroundStyle(Color.accentColor)
 
-                Text("Be phone lazy.\nBe world productive.")
+                Text("Everything you're trying to hold\nin your head. Held.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
