@@ -50,9 +50,10 @@ struct SimulatorGate: View {
 
 struct AuthGate: View {
     @State private var isLoaded = false
+    @State private var devLoggedIn = UserDefaults.standard.bool(forKey: "devLoginActive")
 
     private var isSignedIn: Bool {
-        Clerk.shared.session != nil
+        Clerk.shared.session != nil || devLoggedIn
     }
 
     var body: some View {
@@ -64,12 +65,21 @@ struct AuthGate: View {
                     .background(Color.axisBackground)
             } else if isSignedIn {
                 OnboardingGate(onSignedOut: {
-                    Task {
-                        try? await Clerk.shared.session?.revoke()
+                    if devLoggedIn {
+                        UserDefaults.standard.removeObject(forKey: "devLoginActive")
+                        KeychainService.shared.delete(.clerkJWT)
+                        AppGroupBridge.setToken(nil)
+                        devLoggedIn = false
+                    } else {
+                        Task {
+                            try? await Clerk.shared.session?.revoke()
+                        }
                     }
                 })
             } else {
-                SignInView()
+                SignInView(onDevLogin: {
+                    devLoggedIn = true
+                })
             }
         }
         .task {
