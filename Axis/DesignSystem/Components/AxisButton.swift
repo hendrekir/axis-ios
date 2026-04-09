@@ -6,7 +6,7 @@ struct AxisPrimaryButton: View {
     var destructive: Bool = false
 
     var body: some View {
-        Button(action: action) {
+        Button(action: { Haptics.tap(); action() }) {
             Text(title)
                 .font(.axisBody(15, weight: .medium))
                 .foregroundColor(.white)
@@ -16,6 +16,7 @@ struct AxisPrimaryButton: View {
                     destructive ? Color.axisRed : Color.axisViolet
                 )
                 .cornerRadius(AxisRadius.xl)
+                .shadow(color: Color.axisViolet.opacity(0.25), radius: 24, x: 0, y: 8)
         }
         .buttonStyle(.plain)
     }
@@ -26,7 +27,7 @@ struct AxisSecondaryButton: View {
     let action: () -> Void
 
     var body: some View {
-        Button(action: action) {
+        Button(action: { Haptics.light(); action() }) {
             Text(title)
                 .font(.axisBody(15, weight: .medium))
                 .foregroundColor(.axisTextPrimary)

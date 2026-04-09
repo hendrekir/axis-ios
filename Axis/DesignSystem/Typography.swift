@@ -23,8 +23,8 @@ extension Font {
     // PREDEFINED SCALES
     static let axisHero:   Font = axisSyne(32)       // Screen heroes
     static let axisTitle:  Font = axisSyne(22)        // Section titles
-    static let axisH1:     Font = axisBody(17, weight: .medium)  // Card titles
-    static let axisH2:     Font = axisBody(15, weight: .medium)  // Sub-titles
+    static let axisH1:     Font = axisSyne(28)        // Card titles (Syne bold 28)
+    static let axisH2:     Font = axisSyne(20)        // Sub-titles (Syne semibold 20)
     static let axisBody1:  Font = axisBody(15)        // Primary body
     static let axisBody2:  Font = axisBody(13)        // Secondary body
     static let axisCaption:Font = axisBody(12)        // Captions, labels

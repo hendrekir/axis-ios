@@ -1,36 +1,37 @@
 import SwiftUI
 
 extension Color {
-    // Backgrounds
-    static let axisBackground    = Color(hex: "#0C0A15")  // Primary bg — very deep purple-black
-    static let axisSurface1      = Color(hex: "#110F1C")  // Cards, sheets
-    static let axisSurface2      = Color(hex: "#1A1826")  // Input fields, secondary cards
-    static let axisSurface3      = Color(hex: "#22203A")  // Hover states, selected rows
+    // Backgrounds — four surface levels
+    static let axisBackground    = Color(hex: "#09090F")
+    static let axisSurface1      = Color(hex: "#111118")
+    static let axisSurface2      = Color(hex: "#18181F")
+    static let axisSurface3      = Color(hex: "#1E1E28")
 
     // Accent
-    static let axisViolet        = Color(hex: "#8B5CF6")  // Primary accent — ALL interactive elements
-    static let axisVioletDim     = Color(hex: "#8B5CF6").opacity(0.12)  // Accent fills
-    static let axisVioletBorder  = Color(hex: "#8B5CF6").opacity(0.18)  // Accent borders
+    static let axisViolet        = Color(hex: "#7C3AED")  // Primary accent
+    static let axisVioletLight   = Color(hex: "#8B5CF6")
+    static let axisVioletDim     = Color(hex: "#7C3AED").opacity(0.12)
+    static let axisVioletBorder  = Color(hex: "#7C3AED").opacity(0.18)
 
     // Semantic
-    static let axisGreen         = Color(hex: "#10B981")  // Success, done, positive
+    static let axisGreen         = Color(hex: "#10B981")
     static let axisGreenDim      = Color(hex: "#10B981").opacity(0.12)
-    static let axisAmber         = Color(hex: "#F59E0B")  // Warning, in-progress
+    static let axisAmber         = Color(hex: "#F59E0B")
     static let axisAmberDim      = Color(hex: "#F59E0B").opacity(0.12)
-    static let axisRed           = Color(hex: "#EF4444")  // Destructive, urgent
+    static let axisRed           = Color(hex: "#EF4444")
     static let axisRedDim        = Color(hex: "#EF4444").opacity(0.12)
-    static let axisBlue          = Color(hex: "#3B82F6")  // Info, links
+    static let axisBlue          = Color(hex: "#3B82F6")
 
     // Text
-    static let axisTextPrimary   = Color(hex: "#F0EEFF")  // Body copy
-    static let axisTextSecondary = Color(hex: "#F0EEFF").opacity(0.55)  // Labels, metadata
-    static let axisTextMuted     = Color(hex: "#F0EEFF").opacity(0.28)  // Disabled, hints
-    static let axisTextAccent    = Color(hex: "#8B5CF6")  // Links, active labels
+    static let axisTextPrimary   = Color(hex: "#F4F4F5")
+    static let axisTextSecondary = Color(hex: "#A1A1AA")
+    static let axisTextMuted     = Color(hex: "#52525B")
+    static let axisTextAccent    = Color(hex: "#7C3AED")
 
     // Borders
-    static let axisBorderDefault = Color(hex: "#8B5CF6").opacity(0.08)  // Default card border
-    static let axisBorderStrong  = Color(hex: "#8B5CF6").opacity(0.18)  // Hover, active border
-    static let axisBorderInput   = Color(hex: "#8B5CF6").opacity(0.14)  // Text field borders
+    static let axisBorderDefault = Color.white.opacity(0.06)
+    static let axisBorderStrong  = Color.white.opacity(0.12)
+    static let axisBorderInput   = Color.white.opacity(0.12)
 }
 
 extension Color {

@@ -114,12 +114,22 @@ private struct MessageBubble: View {
                     .lineSpacing(4)
                     .padding(.horizontal, 14)
                     .padding(.vertical, 12)
-                    .background(Color.axisSurface1)
+                    .background(
+                        ZStack {
+                            Color.axisSurface2
+                            Color.axisViolet.opacity(0.05)
+                        }
+                    )
                     .clipShape(BubbleShape(corners: [.topLeft], smallRadius: 4, largeRadius: 18))
                     .overlay(
                         BubbleShape(corners: [.topLeft], smallRadius: 4, largeRadius: 18)
-                            .stroke(Color.axisBorderDefault, lineWidth: 0.5)
+                            .stroke(Color.axisViolet.opacity(0.15), lineWidth: 0.5)
                     )
+                    .overlay(alignment: .leading) {
+                        Rectangle()
+                            .fill(Color.axisViolet)
+                            .frame(width: 2)
+                    }
 
                 // Action buttons
                 if message.isActionable {
