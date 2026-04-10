@@ -64,5 +64,11 @@ struct MainTabView: View {
             SidebarView(isVisible: $sidebarPresented, onSignedOut: onSignedOut)
         }
         .preferredColorScheme(.dark)
+        .onTapGesture {
+            UIApplication.shared.sendAction(
+                #selector(UIResponder.resignFirstResponder),
+                to: nil, from: nil, for: nil
+            )
+        }
     }
 }
