@@ -122,10 +122,10 @@ private struct ConnectionRow: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(connection.label)
                     .font(.subheadline)
-                if connection.isConnected, let date = connection.connectedAt {
-                    Text("Connected \(date, style: .relative) ago")
+                if connection.isConnected {
+                    Text("Connected")
                         .font(.caption2)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.green)
                 }
             }
 

@@ -219,11 +219,18 @@ struct ContextSetupPayload: Encodable {
 // MARK: - Connection
 
 struct Connection: Codable, Identifiable {
-    let id: UUID
     let provider: String
-    let label: String
     let isConnected: Bool
-    let connectedAt: Date?
+
+    var id: String { provider }
+
+    /// Display name derived from provider key.
+    var label: String { provider.capitalized }
+
+    enum CodingKeys: String, CodingKey {
+        case provider
+        case isConnected = "is_connected"
+    }
 }
 
 // MARK: - Apprentice Insight
