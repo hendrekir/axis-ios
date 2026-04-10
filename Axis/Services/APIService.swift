@@ -41,7 +41,7 @@ final class APIService {
         if let devToken = KeychainService.shared.get(.clerkJWT), !devToken.isEmpty {
             request.setValue("Bearer \(devToken)", forHTTPHeaderField: "Authorization")
             AppGroupBridge.setToken(devToken)
-        } else if let token = try? await Clerk.shared.auth.getToken(), let token, !token.isEmpty {
+        } else if let token = try? await Clerk.shared.auth.getToken(), !token.isEmpty {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
             AppGroupBridge.setToken(token)
         }
